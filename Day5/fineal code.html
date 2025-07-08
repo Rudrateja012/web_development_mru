@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rudra Teja Portfolio</title>
+</head>
+<body>
+<center>
+  <header style="background-color: black; color: white;">
+    <h1>Rudra Teja <sub>(Web Developer)</sub></h1>
+    <p>Delivering success with every line of code</p>
+    <nav>
+      <a href="#home">Home</a> |
+      <a href="#about">About</a> |
+      <a href="#projects">Projects</a> |
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="about"><br>
+    <video src="hello.mp4" controls="" >
+    </video>
+    <h1><b>About Me</b></h1>
+    <article>
+      <p>Hello! I'm Rudra, a frontend web developer with a passion for creating clean and responsive designs. I love blending creativity with performance to craft immersive digital experiences.</p>
+      <canvas id="myCanvas" width="300" height="150"></canvas>
+      <script>
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "rgb(0, 0, 255)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(10, 10, 280, 130);
+      </script><br>
+      <audio controls="" autoplay="" preload="auto" muted loop="2">
+        <source src="hello1.mp3">
+    </audio>
+    </article>
+  </section>
+
+  <section id="projects">
+    <h2>My Project's</h2>
+    <article>
+  <h3><u>Project 1: Smart Health Monitoring System</u></h3>
+  <p>A real-time health tracking interface designed using responsive HTML and styled for a modern portfolio.</p>
+
+  <h3><u>Project 2: Hate Text Detection UI</u></h3>
+  <p>A sleek and intuitive interface for moderating harmful content, tailored for e-commerce and social platforms.</p>
+</article>
+  </section>
+
+  <section id="contact"><br>
+    <h2>Contact Me</h2>
+    <form>
+      <label for="email">Email:</label>
+      <input type="email" id="email" required /><br><br>
+
+      <label for="date">Preferred Contact Date:</label>
+      <input type="date" id="date" required /><br>
+<br>
+      <label for="interest">Interest Level (1-10):</label>
+      <input type="range" min="1" max="10" id="interest" /><br><br>
+
+      <label for="message">Your Message:</label>
+      <textarea id="message" rows="4" required></textarea><br><br>
+<button id="demo" onclick="myFunction()">send message</button>
+
+<script>
+function myFunction() {
+  document.getElementById("demo").innerHTML = "Message sent to rudra";
+}
+</script>
+    </form>
+
+    <aside>
+      <h4>📢 Latest News</h4>
+      <p>Currently working on an E-Commerce app at amazon✌️</p>
+    </aside>
+  </section>
+
+  <footer>
+    &copy; 2025 | Rudra | Built with HTML
+  </footer>
+</center>
+</body>
+</html>
