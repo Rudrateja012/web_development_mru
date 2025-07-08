@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .container:hover{
+            box-shadow: 0 0 100px rgb(255, 0, 0);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        </style>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <label for="firstNum">First Number: </label>
+        <input type="number" id="firstNum" placeholder="Enter first number">
+        <label for="operation">operation</label>
+        <select id="operation">
+            <option value="add">+</option>
+            <option value="subtract">-</option>
+            <option value="multiply">*</option>
+            <option value="divide">/</option>
+            <option value="modulus">%</option>
+        </select>
+        <label for="secondNum">Second Number: </label>
+        <input type="number" id="secondNum" placeholder="Enter second number">
+        <button id="calculateBtn" onclick="cal()">Calculate</button>
+        <a href="Day13.html"><button >Back</button></a>
+        <div id="result"></div>
+    </div>
+    <script>
+    function add(a, b) {
+        return a + b;
+    }
+    function subtract(a, b) {
+        return a - b;
+    }
+    function multiply(a, b) {
+        return a * b;
+    }
+    function divide(a, b) {
+        if (b === 0) {
+            alert("Cannot divide by zero.");
+            return undefined;
+        }
+        return a / b;
+    }
+    function modulus(a, b) {
+        return a % b;
+    }
+
+    function cal() {
+        const firstNum = parseFloat(document.getElementById('firstNum').value);
+        const secondNum = parseFloat(document.getElementById('secondNum').value);
+        const operation = document.getElementById('operation').value;
+        let result;
+
+        
+
+        if (operation === 'add') result = add(firstNum, secondNum);
+        else if (operation === 'subtract') result = subtract(firstNum, secondNum);
+        else if (operation === 'multiply') result = multiply(firstNum, secondNum);
+        else if (operation === 'divide') result = divide(firstNum, secondNum);
+        else if (operation === 'modulus') result = modulus(firstNum, secondNum);
+        else {
+            alert("Please select a operation");
+            return;
+        }
+
+        if (result !== undefined) {
+            document.getElementById('result').innerText = `Result: ${result}`;
+        }
+    }
+</script>
+</body>
+</html>

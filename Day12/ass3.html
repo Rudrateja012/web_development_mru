@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 3: Print Triangle Pattern</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+        white-space: pre;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 3: Print Triangle Pattern</h1>
+    <form id="triangleForm" onsubmit="printTriangle(event)">
+      <label
+        >Number of Rows:
+        <input type="number" id="rows" min="1" required /></label
+      ><br />
+      <button class="btn" type="submit">Print Pattern</button>
+    </form>
+    <div class="result" id="result"></div>
+    <button ><a href="home.html"  >← Back to Home</a></button>
+    <script>
+      function printTriangle(event) {
+        event.preventDefault();
+        var rows = parseInt(document.getElementById("rows").value);
+        var pattern = "";
+        for (var i = 1; i <= rows; i++) {
+          pattern += "* ".repeat(i) + "\n";
+        }
+        document.getElementById("result").textContent = pattern;
+      }
+    </script>
+  </body>
+</html>

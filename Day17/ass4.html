@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Assignment 4</h1>
+
+    <script>
+        let employee = [
+            { name: "John Doe", salary: 50000 },
+            { name: "", salary: 60000 },
+            { name: "Alice Johnson", salary: 70000 },
+            { name: "Bob Brown", salary: "" },
+            { name: "", salary: "" }
+        ];
+
+        let employeeReport = (employee) => {
+            console.log("Employee Salary Report");
+            for (const emp of employee) {
+                const salary = emp.salary || "Not Available";
+                const name = emp.name || "Not Available";
+                console.log(`Name: ${name}, Salary: ${salary}`);
+            
+            }
+            };
+
+        employeeReport(employee);
+
+
+
+    </script>
+    
+</body>
+</html>

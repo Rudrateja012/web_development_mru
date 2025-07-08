@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Assignment 3</h1>
+    <script>
+
+
+        const contacts = [
+            { name: "rudra",email:"rudrateja08@gmail.com", phone: "" },
+            { name: "",email:"sudhateja08@gmail.com", phone: "987-654-3210" },
+            { name: "siddharth",email:"gdhgbdg@gmail.com", phone: "555-555-5555" },
+            { name: "sahil",email:"", phone: "444-444-4444" },
+            
+        ];
+        let contact = (contacts) => {
+            console.log("Contact List:");
+
+            for (const contact of contacts) {
+                const email = contact.email || "no email";
+                const phone = contact.phone || "no phone";
+                const name = contact.name || "no name";
+                console.log(`Name: ${name}, Email: ${email}, Phone: ${phone}`);
+
+
+            }
+        }
+        contact(contacts);
+    </script>
+</body>
+</html>

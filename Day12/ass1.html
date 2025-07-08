@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 1: Basic Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      select,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 1: Basic Calculator (using switch)</h1>
+    <form id="calcForm" onsubmit="calculate(event)">
+      <label>First Number: <input type="number" id="num1" required /></label
+      ><br />
+      <label>
+        Operator:
+        <select id="operator" required>
+          <option value="+">+</option>
+          <option value="-">-</option>
+          <option value="*">*</option>
+          <option value="/">/</option>
+        </select> </label
+      ><br />
+      <label>Second Number: <input type="number" id="num2" required /></label
+      ><br />
+      <button class="btn" type="submit">Calculate</button>
+    </form>
+    <div class="result" id="result"></div>
+    <button ><a href="home.html"  >← Back to Home</a></button>
+    <script>
+      function calculator(num1, num2, op) {
+        let res;
+        switch (op) {
+          case "+":
+            res = num1 + num2;
+            break;
+          case "-":
+            res = num1 - num2;
+            break;
+          case "*":
+            res = num1 * num2;
+            break;
+          case "/":
+            if (num2 === 0) res = "Error: Division by zero";
+            else res = num1 / num2;
+            break;
+          default:
+            res = "Invalid operator";
+        }
+        return res;
+      }
+
+      function calculate(event) {
+        event.preventDefault();
+        var num1 = parseFloat(document.getElementById("num1").value);
+        var num2 = parseFloat(document.getElementById("num2").value);
+        var op = document.getElementById("operator").value;
+        var res = calculator(num1, num2, op);
+        document.getElementById("result").textContent = "Result: " + res;
+      }
+    </script>
+  </body>
+</html>

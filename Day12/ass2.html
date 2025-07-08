@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 2: Student Grading System</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        align-items: center;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 2: Student Grading System</h1>
+    <form id="gradeForm" onsubmit="grade(event)">
+      <label
+        >Enter Marks (0-100):
+        <input type="number" id="marks" min="0" max="100"  /></label
+      ><br />
+      <center><button class="btn" type="submit">Get Grade</button></center>
+    </form>
+    <div class="result" id="result"></div>
+    <center><button ><a href="home.html"  >← Back to Home</a></button></center>
+    <script>
+      function getGrade(marks) {
+        if (marks >= 90 && marks <= 100) return "A";
+        else if (marks >= 75 && marks <= 89) return "B";
+        else if (marks >= 60 && marks <= 74) return "C";
+        else if (marks < 60 && marks >= 0) return "Fall";
+        else return "Invalid marks";
+      }
+
+      function grade(event) {
+        event.preventDefault();
+        var marks = parseFloat(document.getElementById("marks").value);
+        var grade = getGrade(marks);
+        document.getElementById("result").textContent = "Grade: " + grade;
+      }
+    </script>
+  </body>
+</html>

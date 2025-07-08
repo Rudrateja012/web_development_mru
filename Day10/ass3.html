@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pricing Layout</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      color: #333;
+    }
+    .pricing-section {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .pricing-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: #ffffff;
+    }
+    .pricing-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .pricing-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 2rem;
+      width: 300px;
+box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 0px 100px  inset;    }
+    .pricing-card:hover {
+      transform: scale(1.05);
+      box-shadow:0px 0px 100px #ffffff;
+    }
+    .pricing-card.card2:hover {
+      box-shadow: 0px 0px 100px #00d0ff;
+      
+    }
+    .pricing-card.card3:hover {
+      box-shadow: 0px 0px 100px #ff0000;
+      
+    }
+    .pricing-card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    .price {
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .price span {
+      font-size: 1rem;
+      color: #555;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+    li {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1.5rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .pricing-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="pricing-section">
+    <h2>Choose Your Plan</h2>
+    <div class="pricing-container">
+      <div class="pricing-card">
+        <h3>Basic</h3>
+        <p class="price">₹199<span>/mo</span></p>
+        
+        <button>Select</button>
+      </div>
+      <div class="pricing-card card2">
+        <h3>Pro</h3>
+        <p class="price">₹499<span>/mo</span></p>
+        
+        <button>Select</button>
+      </div>
+      <div class="pricing-card card3">
+        <h3>Ultimate</h3>
+        <p class="price">₹999<span>/mo</span></p>
+        
+        <button>Select</button>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

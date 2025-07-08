@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 6: Skip Even Numbers</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 6: Skip Even Numbers (Using Continue)</h1>
+    <form id="skipForm" onsubmit="skipEven(event)">
+      <label
+        >Enter Limit: <input type="number" id="limit" min="1" required /></label
+      ><br />
+      <button class="btn" type="submit">Show Odd Numbers</button>
+    </form>
+    <div class="result" id="result"></div>
+    <button ><a href="home.html"  >← Back to Home</a></button>
+    <script>
+      function skipEven(event) {
+        event.preventDefault();
+        var limit = parseInt(document.getElementById("limit").value);
+        let result = [];
+        for (let i = 1; i <= limit; i++) {
+          if (i % 2 === 0) continue;
+          result.push(i);
+        }
+        document.getElementById("result").textContent =
+          "Odd Numbers: " + result.join(", ");
+      }
+      console.log(skipEven(10)); 
+    </script>
+  </body>
+</html>

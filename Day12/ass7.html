@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 7: Stop Pattern When Limit Reached</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+        white-space: pre;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 7: Stop Pattern When Limit Reached (using break)</h1>
+    <form id="breakForm" onsubmit="stopPattern(event)">
+      <label
+        >Enter Limit: <input type="number" id="limit" min="1" required /></label
+      ><br />
+      <button class="btn" type="submit">Show Pattern</button>
+    </form>
+    <div class="result" id="result"></div>
+    <a href="home.html" class="back">← Back to Home</a>
+    <script>
+      function stopPattern(event) {
+        event.preventDefault();
+        var limit = parseInt(document.getElementById("limit").value);
+        var pattern = "";
+        for (var i = 1; i <= 10; i++) {
+          if (i > limit) break;
+          pattern += "* ".repeat(i) + "\n";
+        }
+        document.getElementById("result").textContent = pattern;
+      }
+    </script>
+  </body>
+</html>

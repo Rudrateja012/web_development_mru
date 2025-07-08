@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Student Marks Assignment</title>
+  </head>
+  <body>
+    <h2>Student Marks Operations</h2>
+    <div id="output"></div>
+    <script>
+      let scores = [45, 67, 38, 90, 56];
+      scores.push(72);
+      let lowest = Math.min(...scores);
+      let scoresWithoutLowest = scores.filter((score) => score !== lowest);
+      let total = scoresWithoutLowest.reduce((sum, score) => sum + score, 0);
+      let average = total / scoresWithoutLowest.length;
+      let aboveFifty = scoresWithoutLowest.filter((score) => score > 50);
+      let output = document.getElementById("output");
+      output.innerHTML ="<strong>All Scores (after removing lowest):</strong><br>";
+      scoresWithoutLowest.forEach((score, i) => {
+        output.innerHTML += `Student ${i + 1}: ${score}<br>`;});
+      output.innerHTML += `<br><strong>Average Score:</strong> ${average.toFixed(2)}<br>`;
+      output.innerHTML += `<br><strong>Scores greater than 50:</strong> ${aboveFifty.join(", ")}<br>`;
+    </script>
+  </body>
+</html>

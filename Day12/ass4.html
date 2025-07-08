@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 4: Multiplication Table</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+        white-space: pre;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 4: Multiplication Table</h1>
+    <form id="tableForm" onsubmit="printTable(event)">
+      <label>Enter Number: <input type="number" id="num" required /></label
+      ><br />
+      <button class="btn" type="submit">Show Table</button>
+    </form>
+    <div class="result" id="result"></div>
+    <button ><a href="home.html"  >← Back to Home</a></button>
+    <script>
+      function multiplicationTable(num) {
+        for (let i = 1; i <= 10; i++) {
+          console.log(`${num} x ${i} = ${num * i}`);
+        }
+      }
+      function printTable(event) {
+        event.preventDefault();
+        var num = parseInt(document.getElementById("num").value);
+        multiplicationTable(num);
+        var table = "";
+        for (var i = 1; i <= 10; i++) {
+          table += num + " x " + i + " = " + num * i + "\n";
+        }
+        document.getElementById("result").textContent = table;
+      }
+    </script>
+  </body>
+</html>

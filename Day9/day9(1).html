@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Grid Layout</title>
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: sans-serif;
+  display: grid;
+
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+header {
+  grid-area: header;
+  background: #6c5ce7;
+  padding: 1rem;
+  color: white;
+}
+
+nav {
+  grid-area: nav;
+  background: #00cec9;
+  padding: 1rem;
+}
+
+main {
+  grid-area: main;
+  background: #ffeaa7;
+  padding: 1rem;
+}
+
+aside {
+  grid-area: aside;
+  background: #fab1a0;
+  padding: 1rem;
+}
+
+footer {
+  grid-area: footer;
+  background: #636e72;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Tablet and Up */
+@media (min-width: 600px) {
+  body {
+    grid-template-areas:
+      "header header"
+      "nav nav"
+      "main aside"
+      "footer footer";
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Desktop and Wider */
+@media (min-width: 1024px) {
+  body {
+    grid-template-areas:
+      "header header header"
+      "nav main aside"
+      "footer footer footer";
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+}
+  </style>
+</head>
+<body>
+  <header>Header</header>
+  <nav>Navigation</nav>
+  <main>Main Content</main>
+  <aside>Sidebar</aside>
+  <footer>Footer</footer>
+</body>
+</html>

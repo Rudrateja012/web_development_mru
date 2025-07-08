@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Assignment 1</h1>
+    <script>
+        const students = [
+            { name: "rudra",score: 90 },
+            { name: "siddharth", score: 85 },
+            { name: "sahil", score: 95 },
+            { name: "pranav", score: 80 },
+            { name: "sachin", score: 70 }
+        ];
+        let student = (students) => {
+            let grades ;
+            for (const student of students) {
+                let grade;
+                if (student.score >= 90) {
+                    grade = "A";
+                } else if (student.score >= 80) {
+                    grade = "B";
+                } else if (student.score >= 70) {
+                    grade = "C";
+                } else if (student.score >= 60) {
+                    grade = "D";
+                } else {
+                    grade = "F";
+                }
+                console.log(`Name: ${student.name}, Scored: ${student.score}, Grade: ${grade}`);
+            }
+        }
+        student(students);
+
+    </script>
+</body>
+</html>

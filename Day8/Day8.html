@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flexbox Practice - Day 8</title>
+    <style>
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+      }
+
+      .navbar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 50px;
+        background: #333;
+        color: white;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 15px;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .card-container {
+        width: 350px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 40px 20px;
+      }
+
+      .card1 {
+        order: 1;
+        padding: 20px;
+        background: #a82424;
+        border: 5px solid #0b24c7;
+      }
+      .card2 {
+        order: 1;
+        padding: 20px;
+        background: #f212d8;
+        border: 5px solid #85a018;
+      }
+      .card3 {
+        order: 1;
+        padding: 20px;
+        background: #b6dc60;
+        border: 5px solid #15aa78;
+      }
+      .card4 {
+        order: 2;
+        padding: 20px;
+        background: #2230ac;
+        border: 5px solid #c7660b;
+        color: white;
+      }
+      .card5 {
+        order: 2;
+        padding: 20px;
+        background: #a89424;
+        border: 5px solid #c70bc1;
+      }
+      .gap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div><strong>rudra</strong></div>
+      <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+    </nav>
+
+    <div class="gap">
+        <div class="card-container">
+          <div class="card1">Card 1</div>
+          <div class="card2">Card 2</div>
+          <div class="card3">Card 3</div>
+          <div class="card4">Card 4</div>
+          <div class="card5">Card 5</div>
+        </div>
+
+    </div>
+  </body>
+</html>

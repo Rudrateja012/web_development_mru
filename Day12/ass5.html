@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assignment 5: Count Vowels in a String</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      h1 {
+        color: #1976d2;
+      }
+      label,
+      input {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+      }
+      .btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #1565c0;
+      }
+      .back {
+        margin-top: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Assignment 5: Count Vowels in a String (using for and if)</h1>
+    <form id="vowelForm" onsubmit="countVowels(event)">
+      <label>Enter String: <input type="text" id="str" required /></label><br />
+      <button class="btn" type="submit">Count Vowels</button>
+    </form>
+    <div class="result" id="result"></div>
+    <button ><a href="home.html"  >← Back to Home</a></button>
+    <script>
+      function countVowels(event) {
+        event.preventDefault();
+        var str = document.getElementById("str").value;
+        let count = 0;
+        for (let i = 0; i < str.length; i++) {
+          let ch = str[i].toLowerCase();
+          if (
+            ch === "a" ||
+            ch === "e" ||
+            ch === "i" ||
+            ch === "o" ||
+            ch === "u"
+          ) {
+            count++;
+          }
+        }
+        document.getElementById("result").textContent = "Vowel Count: " + count;
+      }
+    </script>
+  </body>
+</html>

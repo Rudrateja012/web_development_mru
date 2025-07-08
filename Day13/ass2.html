@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .container {
+        max-width: 400px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .container:hover {
+        box-shadow: 0 0 100px rgb(255, 0, 0);
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>String Utilities using Arrow Functions and Function Expressions</h1>
+      <label for="inputString">Enter a string:</label>
+      <input type="text" id="inputString"  placeholder="Enter a string" />
+      <button id="uppercaseBtn" onclick="toUpperCase()">
+        Convert to Uppercase
+      </button>
+      <button id="countBtn" onclick="countLength()">Count Length</button>
+      <button id="reverseBtn" onclick="reverseString()">Reverse String</button>
+      <p id="outputText"></p>
+              <a href="Day13.html"><button >Back</button></a>
+
+    </div>
+    <script>
+      const toUpperCase = () => {
+        const inputString = document.getElementById("inputString").value;
+        document.getElementById("outputText").innerText =
+          inputString.toUpperCase();
+      };
+
+      const countLength = () => {
+        const inputString = document.getElementById("inputString").value;
+        document.getElementById(
+          "outputText"
+        ).innerText = `Length: ${inputString.length}`;
+      };
+
+      const reverseString = () => {
+        const inputString = document.getElementById("inputString").value;
+        document.getElementById("outputText").innerText = inputString
+          .split("")
+          .reverse()
+          .join("");
+      };
+    </script>
+    
+  </body>
+</html>

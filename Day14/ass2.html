@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Cart Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input, button {
+      margin: 5px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+    }
+
+    h2, h3 {
+      color: #333;
+    }
+    #totalPrice {
+      font-weight: bold;
+      color: green;
+
+      input {
+        margin-bottom: 10px;
+        
+      }
+
+    }
+    input[type="text"], input[type="number"] {
+      width: 200px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 5px 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    
+    </style>
+</head>
+<body>
+  <h2>Shopping Cart Manager</h2>
+  <input type="text" id="name" placeholder="Product Name">
+  <input type="number" id="price" placeholder="Price">
+  <button onclick="addProduct()">Add Product</button>
+  <button onclick="removeProduct()">Remove Last Product</button>
+  <h3>Cart:</h3>
+  <ul id="cartList"></ul>
+  <h3>Total Price: ₹<span id="totalPrice">0</span></h3>
+
+  <script>
+    const cart = [];
+
+    function addProduct() {
+      const name = document.getElementById('name').value;
+      const price = parseFloat(document.getElementById('price').value);
+      if (name && !isNaN(price)) {
+        cart.push({ name, price });
+        updateCart();
+      }
+    }
+
+    function removeProduct() {
+      cart.pop();
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartList = document.getElementById('cartList');
+      cartList.innerHTML = '';
+      cart.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} - ₹${item.price}`;
+        cartList.appendChild(li);
+      });
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('totalPrice').textContent = total.toFixed(2);
+    }
+  </script>
+</body>
+</html>
