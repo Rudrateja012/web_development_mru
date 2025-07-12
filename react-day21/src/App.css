@@ -39,6 +39,15 @@
   align-items: center;
   flex-direction: row;
   gap: 50px;
+  transition: box-shadow 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+  transform: scale(1.05);
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+  /*speed incresse */
+  
+}
+.App-logo-container:hover .App-logo {
+  scale: 1.1;
 }
 
 .App-link {

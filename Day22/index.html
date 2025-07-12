@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Countdown (School Project)</title>
+  <style>
+  body {
+    background: #f4f6fa;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  .container {
+    max-width: 300px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0001;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 0px 80px rgb(0, 0, 0);
+  }
+  h1 {
+    text-align: center;
+    color: #2d3a4a;
+  }
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  form > * {
+    min-width: 180px;
+  }
+  label {
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: block;
+  }
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+  button {
+    background: #2d8cf0;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover {
+    background: #1a6ed8;
+  }
+  .events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .event-card {
+    background: #f9fbfd;
+    border-left: 6px solid #2d8cf0;
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 4px #0001;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .event-icon {
+    font-size: 2em;
+    margin-right: 10px;
+  }
+  .event-content {
+    flex: 1;
+  }
+  .event-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2d3a4a;
+  }
+  .event-desc {
+    color: #555;
+    margin: 6px 0;
+  }
+  .event-category {
+    font-size: 0.95em;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .countdown {
+    font-size: 1.1em;
+    color: #1a6ed8;
+    margin: 8px 0;
+  }
+  .event-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .delete-btn {
+    background: #f44336;
+  }
+  .delete-btn:hover {
+    background: #c62828;
+  }
+  .edit-btn {
+    background: #ffb300;
+    color: #222;
+  }
+  .edit-btn:hover {
+    background: #ff8f00;
+  }
+  .reminder {
+    color: #388e3c;
+    font-size: 0.95em;
+    margin-top: 4px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #323232;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 6px;
+    opacity: 0.95;
+    z-index: 9999;
+    font-size: 1.1em;
+  }
+  @media (max-width: 600px) {
+    .container {
+      padding: 10px;
+    }
+    form {
+      flex-direction: column;
+    }
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Event Countdown</h1>
+    <form id="eventForm" autocomplete="off">
+      <div>
+        <label for="title">Event Name </label>
+        <input type="text" id="title"  placeholder="e.g. My Birthday">
+      </div>
+      <div>
+        <label for="desc">Details</label>
+        <textarea id="desc" rows="2" placeholder="Write something about your event..."></textarea>
+      </div>
+      <div>
+        <label for="datetime">Date and Time *</label>
+        <input type="datetime-local" id="datetime" >
+      </div>
+      <div>
+        <label for="email">Email (for reminder)</label>
+        <input type="email" id="email" placeholder="your@email.com">
+      </div>
+      <div>
+        <label for="category">Type</label>
+        <select id="category">
+          <option value="Birthday">Birthday</option>
+          <option value="Meeting">School Meeting</option>
+          <option value="Holiday">Holiday</option>
+          <option value="Custom">Other</option>
+        </select>
+      </div>
+      <div style="align-self: flex-end;">
+        <button type="submit" id="submitBtn">Add</button>
+      </div>
+    </form>
+    <div class="events-list" id="eventsList"></div>
+  </div>
+  <div id="toast" class="toast" style="display:none;"></div>
+  <script>
+function showToast(msg) {
+  let toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+function saveEvents(events) {
+  localStorage.setItem('events', JSON.stringify(events));
+}
+function loadEvents() {
+  let data = localStorage.getItem('events');
+  return data ? JSON.parse(data) : [];
+}
+function formatCountdown(ms) {
+  if (ms <= 0) return '00 Days 00:00:00';
+  let totalSec = Math.floor(ms / 1000);
+  let days = Math.floor(totalSec / 86400);
+  let hrs = Math.floor((totalSec % 86400) / 3600);
+  let min = Math.floor((totalSec % 3600) / 60);
+  let sec = totalSec % 60;
+  return days + 'd ' + hrs + 'h ' + min + 'm ' + sec + 's';
+}
+let events = loadEvents();
+function renderEvents() {
+  let list = document.getElementById('eventsList');
+  list.innerHTML = '';
+  if (events.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:#888;">No events yet.</p>';
+    return;
+  }
+  events.forEach(ev => {
+    let card = document.createElement('div');
+    card.className = 'event-card';
+    card.innerHTML =
+      '<div><b>' + ev.title + '</b></div>' +
+      (ev.desc ? '<div>' + ev.desc + '</div>' : '') +
+      '<div id="countdown-' + ev.id + '"></div>' +
+      '<button onclick="deleteEvent(\'' + ev.id + '\')">Delete</button>';
+    list.appendChild(card);
+  });
+}
+function updateCountdowns() {
+  let now = Date.now();
+  events.forEach(ev => {
+    let el = document.getElementById('countdown-' + ev.id);
+    if (!el) return;
+    let ms = new Date(ev.datetime).getTime() - now;
+    if (ms > 0) {
+      el.textContent = formatCountdown(ms);
+    } else {
+      el.textContent = ev.title + ' is happening now!';
+    }
+  });
+}
+setInterval(updateCountdowns, 1000);
+document.getElementById('eventForm').onsubmit = function(e) {
+  e.preventDefault();
+  let title = document.getElementById('title').value.trim();
+  let desc = document.getElementById('desc').value.trim();
+  let datetime = document.getElementById('datetime').value;
+  if (!title) { showToast('Event title is required!'); return; }
+  if (!datetime) { showToast('Event date & time is required!'); return; }
+  let dt = new Date(datetime);
+  if (isNaN(dt.getTime()) || dt.getTime() <= Date.now()) { showToast('Date & time must be in the future!'); return; }
+  let id = 'ev' + Date.now() + Math.random().toString(36).slice(2,7);
+  events.push({ id, title, desc, datetime });
+  showToast('Event added!');
+  saveEvents(events);
+  renderEvents();
+  updateCountdowns();
+  this.reset();
+};
+window.deleteEvent = function(id) {
+  if (!confirm('Delete this event?')) return;
+  events = events.filter(ev => ev.id !== id);
+  saveEvents(events);
+  renderEvents();
+  updateCountdowns();
+  showToast('Event deleted.');
+};
+renderEvents();
+updateCountdowns();
+  </script>
+</body>
+</html>
