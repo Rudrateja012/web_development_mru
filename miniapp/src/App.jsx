@@ -69,7 +69,7 @@ const Navbar = () => (
 const HeroSection = () => (
   <section id="hero" className="hero-section">
     <div>
-      <h1 className="restaurant-name">Restoria</h1>
+      <h1 className="restaurant-name">Rudra</h1>
       <p className="tagline">A Fine Dining Experience</p>
       <p className="open-hours">Open: 12pm - 11pm</p>
       <p className="address">123 Gourmet Lane, Mumbai</p>
