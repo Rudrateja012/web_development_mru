@@ -1,5 +1,6 @@
 import './App.css';
 import logo from './logoq.svg';
+import StudentRankingList from './StudentRankingList';
 
 const menuData = {
   Starters: [
@@ -56,6 +57,7 @@ const chefs = [
 
 const Navbar = () => (
   <nav className="navbar">
+    
     <a href="#hero">Home</a>
     <a href="#about">About</a>
     <a href="#menu">Menu</a>
@@ -186,6 +188,7 @@ function App() {
       <TestimonialsSection />
       <ChefTeamSection />
       <Footer />
+      <StudentRankingList />
     </div>
   );
 }
