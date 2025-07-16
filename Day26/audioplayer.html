@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Player</title>
+    <style>
+      body {
+        text-align: center;
+        font-family: sans-serif;
+        transition: 0.3s;
+      }
+
+      .dark {
+        background: #111;
+      }
+
+      .container {
+        margin: 80px auto;
+        max-width: 800px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        box-shadow: 0px 0px 90px rgb(0, 251, 255);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .dark .container {
+        background: rgba(34, 34, 34, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      img {
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        margin: 10px;
+        transition: 0.5s;
+        border-radius: 50%;
+        box-shadow: 0px 0px 90px rgb(0, 251, 255);
+      }
+
+      .rotate {
+        animation: spin 4s linear infinite;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 0.3;
+      }
+
+      button {
+        margin: 5px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        background: #0077cc;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #005fa3;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px;
+        background: #444;
+        color: #fff;
+        border-radius: 5px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <video autoplay muted loop>
+      <source src="video.mp4" />
+    </video>
+
+    <div class="container">
+      <img
+        id="art"
+        src="https://www.boston.com/wp-content/uploads/2012/12/24f9e12c-4af5-11e2-9306-c1529ce3062e.jpg"
+        alt="Album Art"
+      />
+      <div id="title">Now Playing: None</div>
+      <audio id="audio" controls></audio><br />
+      <button id="playBtn">Play Random</button>
+      <button id="themeBtn">Toggle Theme</button>
+    </div>
+    <div id="toast" class="toast"></div>
+
+    <script>
+      const songs = [
+        {
+          title: "Epic Adventure",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Chill Vibes",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+          img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Dreamy Nights",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Electronic Pulse",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+          img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Acoustic Soul",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Urban Beat",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+          img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Jazz Fusion",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Synthwave Retro",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+          img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Classical Modern",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Rock Anthem",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+          img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Ambient Space",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3",
+          img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Folk Melody",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Pop Energy",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3",
+          img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "Blues Highway",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3",
+          img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=180&h=180&fit=crop&crop=center",
+        },
+        {
+          title: "World Fusion",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3",
+          img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=180&h=180&fit=crop&crop=center",
+        }
+      ];
+
+      let i = 0;
+      const audio = document.getElementById("audio");
+      const art = document.getElementById("art");
+      const title = document.getElementById("title");
+      const toast = document.getElementById("toast");
+      const playBtn = document.getElementById("playBtn");
+      const themeBtn = document.getElementById("themeBtn");
+
+      playBtn.onclick = playRandom;
+      themeBtn.onclick = () => {
+        document.body.classList.toggle("dark");
+      };
+
+      function playRandom() {
+        i = (i + 1) % songs.length;
+        const s = songs[i];
+        audio.src = s.src;
+        audio.play();
+        
+        // Update image with error handling
+        art.onerror = function() {
+          console.log("Image failed to load, using default");
+          art.src = "https://www.boston.com/wp-content/uploads/2012/12/24f9e12c-4af5-11e2-9306-c1529ce3062e.jpg";
+        };
+        
+        art.onload = function() {
+          console.log("Image loaded successfully: " + s.img);
+        };
+        
+        art.src = s.img;
+        art.classList.add("rotate");
+        title.textContent = "Now Playing: " + s.title;
+        toast.textContent = s.title + " started!";
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 2000);
+      }
+
+      audio.onpause = () => {
+        art.classList.remove("rotate");
+      };
+
+      audio.onended = () => {
+        playRandom();
+      };
+    </script>
+  </body>
+</html>

@@ -5,11 +5,10 @@ const EMOJIS = ["😂", "😎", "🥳", "🤖", "🐱", "🍕", "🚀", "🎉"];
 
 export default function App() {
   const [cards, setCards] = useState([]);
-  const [flipped, setFlipped] = useState([]); // indexes of flipped cards
-  const [matched, setMatched] = useState([]); // indexes of matched cards
-  const [lock, setLock] = useState(false);    // prevent clicking during check
+  const [flipped, setFlipped] = useState([]);
+  const [matched, setMatched] = useState([]); 
+  const [lock, setLock] = useState(false);    
 
-  // initialize shuffled cards
   useEffect(() => {
     const shuffled = shuffle([...EMOJIS, ...EMOJIS]).map((emoji, index) => ({
       id: index,
