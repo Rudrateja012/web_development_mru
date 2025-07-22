@@ -37,8 +37,30 @@ export default class Register extends Component {
       this.setState({ message: '❌ Password must be at least 6 characters!' })
       return
     }
+
+    // Check if user already exists
+    const users = JSON.parse(localStorage.getItem('registeredUsers')) || []
+    const userExists = users.find(user => user.email === email)
     
-    this.setState({ message: '✅ Registration Successful!' })
+    if (userExists) {
+      this.setState({ message: '❌ User with this email already exists!' })
+      return
+    }
+
+    // Save user to localStorage
+    const newUser = {
+      firstName,
+      lastName,
+      email,
+      password,
+      registeredAt: new Date().toISOString()
+    }
+    
+    users.push(newUser)
+    localStorage.setItem('registeredUsers', JSON.stringify(users))
+    
+    this.setState({ message: '✅ Registration Successful! You can now login.' })
+    
     // Reset form
     setTimeout(() => {
       this.setState({
