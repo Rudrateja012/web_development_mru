@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Switch, NavLink } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom'
 
 import Home from './components/Home'
 import Login from './components/Login'
@@ -59,7 +59,7 @@ export default class Main extends Component {
   handleNavigation = (path) => {
     this.setState({ isLoading: true })
     setTimeout(() => {
-      window.location.href = path
+      this.setState({ isLoading: false })
     }, 500) // Small delay to show loading animation
   }
 
@@ -349,28 +349,22 @@ export default class Main extends Component {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
                 <NavLink 
                   to='/home' 
-                  activeStyle={{
-                    background: 'linear-gradient(135deg, #007bff, #0056b3)',
-                    color: 'white',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(0, 123, 255, 0.3)'
-                  }}
-                  style={{
+                  style={({ isActive }) => ({
                     textDecoration: 'none',
                     padding: '12px 20px',
                     borderRadius: '10px',
-                    color: '#007bff',
+                    color: isActive ? 'white' : '#007bff',
+                    background: isActive ? 'linear-gradient(135deg, #007bff, #0056b3)' : 'transparent',
                     border: '2px solid #007bff',
                     fontWeight: '600',
                     transition: 'all 0.3s ease',
                     fontSize: '14px',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    this.handleNavigation('/home')
-                  }}
+                    letterSpacing: '0.5px',
+                    transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                    boxShadow: isActive ? '0 8px 25px rgba(0, 123, 255, 0.3)' : 'none'
+                  })}
+                  onClick={() => this.handleNavigation('/home')}
                 >
                   🏠 Home
                 </NavLink>
@@ -378,28 +372,22 @@ export default class Main extends Component {
                 {isLoggedIn && (
                   <NavLink 
                     to='/dashboard' 
-                    activeStyle={{
-                      background: 'linear-gradient(135deg, #6f42c1, #5a2d91)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(111, 66, 193, 0.3)'
-                    }}
-                    style={{
+                    style={({ isActive }) => ({
                       textDecoration: 'none',
                       padding: '12px 20px',
                       borderRadius: '10px',
-                      color: '#6f42c1',
+                      color: isActive ? 'white' : '#6f42c1',
+                      background: isActive ? 'linear-gradient(135deg, #6f42c1, #5a2d91)' : 'transparent',
                       border: '2px solid #6f42c1',
                       fontWeight: '600',
                       transition: 'all 0.3s ease',
                       fontSize: '14px',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      this.handleNavigation('/dashboard')
-                    }}
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(111, 66, 193, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/dashboard')}
                   >
                     🎯 Dashboard
                   </NavLink>
@@ -408,28 +396,22 @@ export default class Main extends Component {
                 {isLoggedIn && (
                   <NavLink 
                     to='/profile' 
-                    activeStyle={{
-                      background: 'linear-gradient(135deg, #e91e63, #ad1457)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(233, 30, 99, 0.3)'
-                    }}
-                    style={{
+                    style={({ isActive }) => ({
                       textDecoration: 'none',
                       padding: '12px 20px',
                       borderRadius: '10px',
-                      color: '#e91e63',
+                      color: isActive ? 'white' : '#e91e63',
+                      background: isActive ? 'linear-gradient(135deg, #e91e63, #ad1457)' : 'transparent',
                       border: '2px solid #e91e63',
                       fontWeight: '600',
                       transition: 'all 0.3s ease',
                       fontSize: '14px',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      this.handleNavigation('/profile')
-                    }}
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(233, 30, 99, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/profile')}
                   >
                     👤 Profile
                   </NavLink>
@@ -438,28 +420,22 @@ export default class Main extends Component {
                 {!isLoggedIn && (
                   <NavLink 
                     to='/login'
-                    activeStyle={{
-                      background: 'linear-gradient(135deg, #28a745, #1e7e34)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(40, 167, 69, 0.3)'
-                    }}
-                    style={{
+                    style={({ isActive }) => ({
                       textDecoration: 'none',
                       padding: '12px 20px',
                       borderRadius: '10px',
-                      color: '#28a745',
+                      color: isActive ? 'white' : '#28a745',
+                      background: isActive ? 'linear-gradient(135deg, #28a745, #1e7e34)' : 'transparent',
                       border: '2px solid #28a745',
                       fontWeight: '600',
                       transition: 'all 0.3s ease',
                       fontSize: '14px',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      this.handleNavigation('/login')
-                    }}
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(40, 167, 69, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/login')}
                   >
                     🔐 Login
                   </NavLink>
@@ -468,28 +444,22 @@ export default class Main extends Component {
                 {!isLoggedIn && (
                   <NavLink 
                     to='/register'
-                    activeStyle={{
-                      background: 'linear-gradient(135deg, #ffc107, #e0a800)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(255, 193, 7, 0.3)'
-                    }}
-                    style={{
+                    style={({ isActive }) => ({
                       textDecoration: 'none',
                       padding: '12px 20px',
                       borderRadius: '10px',
-                      color: '#ffc107',
+                      color: isActive ? 'white' : '#ffc107',
+                      background: isActive ? 'linear-gradient(135deg, #ffc107, #e0a800)' : 'transparent',
                       border: '2px solid #ffc107',
                       fontWeight: '600',
                       transition: 'all 0.3s ease',
                       fontSize: '14px',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      this.handleNavigation('/register')
-                    }}
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(255, 193, 7, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/register')}
                   >
                     📝 Register
                   </NavLink>
@@ -498,28 +468,22 @@ export default class Main extends Component {
                 {isLoggedIn && (
                   <NavLink 
                     to='/showemps'
-                    activeStyle={{
-                      background: 'linear-gradient(135deg, #17a2b8, #138496)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(23, 162, 184, 0.3)'
-                    }}
-                    style={{
+                    style={({ isActive }) => ({
                       textDecoration: 'none',
                       padding: '12px 20px',
                       borderRadius: '10px',
-                      color: '#17a2b8',
+                      color: isActive ? 'white' : '#17a2b8',
+                      background: isActive ? 'linear-gradient(135deg, #17a2b8, #138496)' : 'transparent',
                       border: '2px solid #17a2b8',
                       fontWeight: '600',
                       transition: 'all 0.3s ease',
                       fontSize: '14px',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      this.handleNavigation('/showemps')
-                    }}
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(23, 162, 184, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/showemps')}
                   >
                     👥 Employees
                   </NavLink>
@@ -528,28 +492,22 @@ export default class Main extends Component {
                 {isLoggedIn && (
                   <NavLink 
                     to='/products'
-                    activeStyle={{
-                      background: 'linear-gradient(135deg, #dc3545, #c82333)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(220, 53, 69, 0.3)'
-                    }}
-                    style={{
+                    style={({ isActive }) => ({
                       textDecoration: 'none',
                       padding: '12px 20px',
                       borderRadius: '10px',
-                      color: '#dc3545',
+                      color: isActive ? 'white' : '#dc3545',
+                      background: isActive ? 'linear-gradient(135deg, #dc3545, #c82333)' : 'transparent',
                       border: '2px solid #dc3545',
                       fontWeight: '600',
                       transition: 'all 0.3s ease',
                       fontSize: '14px',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      this.handleNavigation('/products')
-                    }}
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(220, 53, 69, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/products')}
                   >
                     🛍️ Products
                   </NavLink>
@@ -651,7 +609,8 @@ export default class Main extends Component {
                         
                         {/* Menu Items */}
                         <div style={{ padding: '10px 0' }}>
-                          <button
+                          <NavLink
+                            to="/profile"
                             onClick={() => {
                               this.handleNavigation('/profile')
                               this.closeProfileDropdown()
@@ -669,7 +628,8 @@ export default class Main extends Component {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '10px',
-                              color: '#2d3748'
+                              color: '#2d3748',
+                              textDecoration: 'none'
                             }}
                             onMouseOver={(e) => {
                               e.target.style.background = 'rgba(102, 126, 234, 0.1)'
@@ -679,9 +639,10 @@ export default class Main extends Component {
                             }}
                           >
                             👤 View Profile
-                          </button>
+                          </NavLink>
                           
-                          <button
+                          <NavLink
+                            to="/dashboard"
                             onClick={() => {
                               this.handleNavigation('/dashboard')
                               this.closeProfileDropdown()
@@ -699,7 +660,8 @@ export default class Main extends Component {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '10px',
-                              color: '#2d3748'
+                              color: '#2d3748',
+                              textDecoration: 'none'
                             }}
                             onMouseOver={(e) => {
                               e.target.style.background = 'rgba(102, 126, 234, 0.1)'
@@ -709,7 +671,7 @@ export default class Main extends Component {
                             }}
                           >
                             🎯 Dashboard
-                          </button>
+                          </NavLink>
                           
                           <button
                             onClick={() => {
@@ -825,16 +787,16 @@ export default class Main extends Component {
               backdropFilter: 'blur(15px)',
               border: '1px solid rgba(255,255,255,0.3)'
             }}>
-              <Switch>
-                <Route exact path="/" component={isLoggedIn ? Dashboard : Home} />
-                <Route path="/home" component={Home} />
-                <Route path="/login" component={Login} />
-                <Route path="/register" component={Register} />
-                <Route path="/dashboard" component={Dashboard} />
-                <Route path="/profile" component={Profile} />
-                <Route path="/showemps" component={ShowEmployees} />
-                <Route path="/products" component={Products} />
-              </Switch>
+              <Routes>
+                <Route path="/" element={isLoggedIn ? <Dashboard /> : <Home />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/showemps" element={<ShowEmployees />} />
+                <Route path="/products" element={<Products />} />
+              </Routes>
             </div>
         </div>
       </Router>
