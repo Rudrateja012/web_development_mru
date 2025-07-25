@@ -1,372 +1,514 @@
 import React, { Component } from 'react'
+import ThemeProvider from './portfolio/ThemeProvider'
 import ProjectHeader from './portfolio/ProjectHeader'
 import ProjectStats from './portfolio/ProjectStats'
 import FeatureShowcase from './portfolio/FeatureShowcase'
-import TechStack from './portfolio/TechStack'
 import ProjectInteractions from './portfolio/ProjectInteractions'
-import ThemeProvider from './portfolio/ThemeProvider'
 
-class PortfolioProject extends Component {
+export default class PortfolioProject extends Component {
   constructor(props) {
     super(props)
+    
+    // Get saved data from localStorage
+    const savedTheme = localStorage.getItem('portfolioTheme') || 'dark'
+    const savedProjects = JSON.parse(localStorage.getItem('portfolioProjects')) || this.getDefaultProjects()
+    const savedSettings = JSON.parse(localStorage.getItem('portfolioSettings')) || {
+      autoSave: true,
+      animations: true,
+      notifications: true,
+      sound: false
+    }
+    
     this.state = {
-      theme: localStorage.getItem('portfolioTheme') || 'dark',
-      isEditing: false,
+      theme: savedTheme,
+      projects: savedProjects,
+      filteredProjects: savedProjects,
+      selectedProject: savedProjects[0] || null,
       searchTerm: '',
-      activeFeature: null,
-      stats: {
-        totalUsers: 1247,
-        activeProjects: 23,
-        completedTasks: 856,
-        satisfaction: 98.5,
-        uptime: 99.9,
-        responses: '2.3s'
+      filterCategory: 'all',
+      sortBy: 'newest',
+      isEditing: false,
+      showAddModal: false,
+      settings: savedSettings,
+      loading: false,
+      error: null,
+      viewMode: 'grid', // grid, list, card
+      selectedTags: [],
+      showStatsModal: false,
+      draggedProject: null,
+      hoveredProject: null,
+      undoStack: [],
+      redoStack: []
+    }
+
+    // Debounce search to improve performance
+    this.searchDebounceTimer = null
+  }
+
+  componentDidMount() {
+    // Initialize component
+    this.loadProjects()
+    this.setupEventListeners()
+    
+    // Auto-save interval
+    if (this.state.settings.autoSave) {
+      this.autoSaveInterval = setInterval(() => {
+        this.saveToLocalStorage()
+      }, 30000) // Save every 30 seconds
+    }
+  }
+
+  componentWillUnmount() {
+    // Cleanup
+    this.removeEventListeners()
+    if (this.autoSaveInterval) {
+      clearInterval(this.autoSaveInterval)
+    }
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer)
+    }
+  }
+
+  // Default projects data
+  getDefaultProjects = () => {
+    return [
+      {
+        id: 1,
+        title: 'E-commerce Dashboard',
+        description: 'A comprehensive dashboard for managing online store operations with real-time analytics.',
+        category: 'Web Application',
+        technologies: ['React', 'Node.js', 'MongoDB', 'Chart.js'],
+        image: '/api/placeholder/400/250',
+        github: 'https://github.com/username/ecommerce-dashboard',
+        demo: 'https://ecommerce-demo.com',
+        status: 'completed',
+        featured: true,
+        startDate: '2024-01-15',
+        endDate: '2024-03-20',
+        team: ['John Doe', 'Jane Smith'],
+        metrics: {
+          stars: 45,
+          forks: 12,
+          views: 1250,
+          downloads: 340
+        },
+        tags: ['responsive', 'analytics', 'real-time', 'dashboard'],
+        features: [
+          'Real-time sales tracking',
+          'Inventory management',
+          'Customer analytics',
+          'Revenue reporting',
+          'Mobile responsive design'
+        ]
       },
-      features: [
-        {
-          id: 1,
-          icon: '👥',
-          title: 'Employee Management',
-          description: 'Comprehensive workforce management with real-time tracking, performance analytics, and automated workflows.',
-          technologies: ['React', 'Node.js', 'MongoDB', 'Socket.io'],
-          status: 'Active',
-          completion: 95,
-          demoUrl: '/showemps',
-          githubUrl: '#',
-          highlights: ['Real-time updates', 'Role-based access', 'Performance tracking']
+      {
+        id: 2,
+        title: 'Music Streaming App',
+        description: 'A modern music streaming application with offline support and personalized playlists.',
+        category: 'Mobile App',
+        technologies: ['React Native', 'Firebase', 'Expo', 'Redux'],
+        image: '/api/placeholder/400/250',
+        github: 'https://github.com/username/music-app',
+        demo: 'https://music-app-demo.com',
+        status: 'in-progress',
+        featured: true,
+        startDate: '2024-02-01',
+        endDate: null,
+        team: ['John Doe'],
+        metrics: {
+          stars: 28,
+          forks: 8,
+          views: 890,
+          downloads: 156
         },
-        {
-          id: 2,
-          icon: '🔐',
-          title: 'Authentication System',
-          description: 'Secure multi-factor authentication with JWT tokens, session management, and role-based authorization.',
-          technologies: ['JWT', 'bcrypt', 'OAuth2', 'Redis'],
-          status: 'Active',
-          completion: 100,
-          demoUrl: '/login',
-          githubUrl: '#',
-          highlights: ['JWT Security', 'Multi-factor auth', 'Session persistence']
+        tags: ['mobile', 'streaming', 'offline', 'music'],
+        features: [
+          'Offline music playback',
+          'Custom playlists',
+          'Social sharing',
+          'Cross-platform support',
+          'Audio visualization'
+        ]
+      },
+      {
+        id: 3,
+        title: 'Task Management System',
+        description: 'A collaborative task management platform with team collaboration features.',
+        category: 'Productivity',
+        technologies: ['Vue.js', 'Express', 'PostgreSQL', 'Socket.io'],
+        image: '/api/placeholder/400/250',
+        github: 'https://github.com/username/task-manager',
+        demo: 'https://task-manager-demo.com',
+        status: 'completed',
+        featured: false,
+        startDate: '2023-11-10',
+        endDate: '2024-01-05',
+        team: ['John Doe', 'Mike Johnson', 'Sarah Wilson'],
+        metrics: {
+          stars: 67,
+          forks: 23,
+          views: 2100,
+          downloads: 580
         },
-        {
-          id: 3,
-          icon: '📊',
-          title: 'Analytics Dashboard',
-          description: 'Real-time data visualization with interactive charts, KPI tracking, and automated reporting.',
-          technologies: ['Chart.js', 'D3.js', 'WebSocket', 'Redis'],
-          status: 'Active',
-          completion: 88,
-          demoUrl: '/dashboard',
-          githubUrl: '#',
-          highlights: ['Real-time charts', 'Custom KPIs', 'Export reports']
-        },
-        {
-          id: 4,
-          icon: '🛍️',
-          title: 'Product Management',
-          description: 'Inventory management system with search functionality, category filtering, and order tracking.',
-          technologies: ['React Hooks', 'Context API', 'LocalStorage', 'CSS Grid'],
-          status: 'Active',
-          completion: 92,
-          demoUrl: '/products',
-          githubUrl: '#',
-          highlights: ['Search & filter', 'Inventory tracking', 'Order management']
-        },
-        {
-          id: 5,
-          icon: '🎨',
-          title: 'Theme System',
-          description: 'Dynamic theme switching with dark/light modes, custom color schemes, and accessibility features.',
-          technologies: ['CSS Variables', 'Context API', 'LocalStorage', 'ARIA'],
-          status: 'Beta',
-          completion: 75,
-          demoUrl: '#',
-          githubUrl: '#',
-          highlights: ['Dynamic themes', 'Accessibility', 'User preferences']
-        }
-      ],
-      projectMetrics: {
-        codeLines: '12,500+',
-        components: '25+',
-        testCoverage: '94%',
-        performance: 'A+',
-        accessibility: 'AA'
+        tags: ['collaboration', 'productivity', 'real-time', 'teams'],
+        features: [
+          'Real-time collaboration',
+          'Kanban boards',
+          'Time tracking',
+          'Team chat',
+          'Project analytics'
+        ]
+      }
+    ]
+  }
+
+  // Event handlers
+  setupEventListeners = () => {
+    document.addEventListener('keydown', this.handleKeyPress)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+  }
+
+  removeEventListeners = () => {
+    document.removeEventListener('keydown', this.handleKeyPress)
+    window.removeEventListener('beforeunload', this.handleBeforeUnload)
+  }
+
+  handleKeyPress = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case 's':
+          e.preventDefault()
+          this.saveToLocalStorage()
+          break
+        case 'z':
+          if (e.shiftKey) {
+            this.redo()
+          } else {
+            this.undo()
+          }
+          break
+        case 'f':
+          e.preventDefault()
+          document.querySelector('.search-input')?.focus()
+          break
+        default:
+          break
       }
     }
   }
 
-  componentDidMount() {
-    // Apply saved theme
-    this.applyTheme(this.state.theme)
+  handleBeforeUnload = (e) => {
+    this.saveToLocalStorage()
+  }
+
+  // Data management
+  loadProjects = () => {
+    this.setState({ loading: true })
     
-    // Add keyboard shortcuts
-    document.addEventListener('keydown', this.handleKeyboardShortcuts)
-    
-    // Animate elements on load
     setTimeout(() => {
-      this.setState({ isLoaded: true })
-    }, 300)
+      this.setState({ 
+        loading: false,
+        filteredProjects: this.filterAndSortProjects()
+      })
+    }, 500)
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleKeyboardShortcuts)
-  }
-
-  handleKeyboardShortcuts = (e) => {
-    // Toggle theme with Ctrl+T
-    if (e.ctrlKey && e.key === 't') {
-      e.preventDefault()
-      this.toggleTheme()
-    }
-    
-    // Toggle editing mode with Ctrl+E
-    if (e.ctrlKey && e.key === 'e') {
-      e.preventDefault()
-      this.toggleEditMode()
-    }
-    
-    // Clear search with Escape
-    if (e.key === 'Escape') {
-      this.setState({ searchTerm: '', activeFeature: null })
+  saveToLocalStorage = () => {
+    try {
+      localStorage.setItem('portfolioTheme', this.state.theme)
+      localStorage.setItem('portfolioProjects', JSON.stringify(this.state.projects))
+      localStorage.setItem('portfolioSettings', JSON.stringify(this.state.settings))
+      
+      if (this.state.settings.notifications) {
+        this.showNotification('Portfolio data saved successfully!', 'success')
+      }
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error)
+      this.showNotification('Failed to save data', 'error')
     }
   }
 
+  // Theme management
   toggleTheme = () => {
     const newTheme = this.state.theme === 'dark' ? 'light' : 'dark'
-    this.setState({ theme: newTheme })
-    localStorage.setItem('portfolioTheme', newTheme)
-    this.applyTheme(newTheme)
+    this.setState({ theme: newTheme }, () => {
+      this.saveToLocalStorage()
+    })
   }
 
-  applyTheme = (theme) => {
-    const root = document.documentElement
-    if (theme === 'dark') {
-      root.style.setProperty('--bg-primary', '#0f172a')
-      root.style.setProperty('--bg-secondary', '#1e293b')
-      root.style.setProperty('--bg-tertiary', '#334155')
-      root.style.setProperty('--text-primary', '#f8fafc')
-      root.style.setProperty('--text-secondary', '#cbd5e1')
-      root.style.setProperty('--text-muted', '#94a3b8')
-      root.style.setProperty('--border-color', '#475569')
-      root.style.setProperty('--accent-primary', '#3b82f6')
-      root.style.setProperty('--accent-secondary', '#8b5cf6')
-      root.style.setProperty('--success', '#10b981')
-      root.style.setProperty('--warning', '#f59e0b')
-      root.style.setProperty('--error', '#ef4444')
-    } else {
-      root.style.setProperty('--bg-primary', '#ffffff')
-      root.style.setProperty('--bg-secondary', '#f8fafc')
-      root.style.setProperty('--bg-tertiary', '#e2e8f0')
-      root.style.setProperty('--text-primary', '#1e293b')
-      root.style.setProperty('--text-secondary', '#475569')
-      root.style.setProperty('--text-muted', '#64748b')
-      root.style.setProperty('--border-color', '#cbd5e1')
-      root.style.setProperty('--accent-primary', '#3b82f6')
-      root.style.setProperty('--accent-secondary', '#8b5cf6')
-      root.style.setProperty('--success', '#059669')
-      root.style.setProperty('--warning', '#d97706')
-      root.style.setProperty('--error', '#dc2626')
+  // Project filtering and sorting
+  filterAndSortProjects = () => {
+    let filtered = [...this.state.projects]
+
+    // Apply search filter
+    if (this.state.searchTerm) {
+      const term = this.state.searchTerm.toLowerCase()
+      filtered = filtered.filter(project =>
+        project.title.toLowerCase().includes(term) ||
+        project.description.toLowerCase().includes(term) ||
+        project.technologies.some(tech => tech.toLowerCase().includes(term)) ||
+        project.tags.some(tag => tag.toLowerCase().includes(term))
+      )
     }
-  }
 
-  toggleEditMode = () => {
-    this.setState(prevState => ({ isEditing: !prevState.isEditing }))
+    // Apply category filter
+    if (this.state.filterCategory !== 'all') {
+      filtered = filtered.filter(project => 
+        project.category === this.state.filterCategory
+      )
+    }
+
+    // Apply tag filter
+    if (this.state.selectedTags.length > 0) {
+      filtered = filtered.filter(project =>
+        this.state.selectedTags.every(tag =>
+          project.tags.includes(tag)
+        )
+      )
+    }
+
+    // Apply sorting
+    switch (this.state.sortBy) {
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+        break
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+        break
+      case 'popularity':
+        filtered.sort((a, b) => b.metrics.stars - a.metrics.stars)
+        break
+      case 'alphabetical':
+        filtered.sort((a, b) => a.title.localeCompare(b.title))
+        break
+      default:
+        break
+    }
+
+    return filtered
   }
 
   handleSearch = (searchTerm) => {
-    this.setState({ searchTerm })
+    // Debounce search for better performance
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer)
+    }
+
+    this.searchDebounceTimer = setTimeout(() => {
+      this.setState({
+        searchTerm,
+        filteredProjects: this.filterAndSortProjects()
+      })
+    }, 300)
   }
 
-  handleFeatureClick = (featureId) => {
-    this.setState({ activeFeature: featureId })
+  handleFilterChange = (filterCategory) => {
+    this.setState({
+      filterCategory,
+      filteredProjects: this.filterAndSortProjects()
+    })
   }
 
-  updateFeature = (featureId, updates) => {
-    this.setState(prevState => ({
-      features: prevState.features.map(feature =>
-        feature.id === featureId ? { ...feature, ...updates } : feature
-      )
-    }))
+  handleSortChange = (sortBy) => {
+    this.setState({
+      sortBy,
+      filteredProjects: this.filterAndSortProjects()
+    })
   }
 
-  filteredFeatures = () => {
-    const { features, searchTerm } = this.state
-    if (!searchTerm) return features
-    
-    return features.filter(feature =>
-      feature.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.technologies.some(tech => 
-        tech.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    )
+  // Utility functions
+  showNotification = (message, type = 'info') => {
+    // Implementation for toast notifications
+    console.log(`${type.toUpperCase()}: ${message}`)
+  }
+
+  undo = () => {
+    if (this.state.undoStack.length > 0) {
+      const previousState = this.state.undoStack.pop()
+      this.state.redoStack.push({ projects: this.state.projects })
+      this.setState({
+        projects: previousState.projects,
+        filteredProjects: this.filterAndSortProjects()
+      })
+    }
+  }
+
+  redo = () => {
+    if (this.state.redoStack.length > 0) {
+      const nextState = this.state.redoStack.pop()
+      this.state.undoStack.push({ projects: this.state.projects })
+      this.setState({
+        projects: nextState.projects,
+        filteredProjects: this.filterAndSortProjects()
+      })
+    }
   }
 
   render() {
-    const { 
-      theme, 
-      isEditing, 
-      searchTerm, 
-      activeFeature, 
-      stats, 
-      projectMetrics,
-      isLoaded 
-    } = this.state
+    const { theme, loading, error } = this.state
 
-    const filteredFeatures = this.filteredFeatures()
+    if (loading) {
+      return (
+        <div style={this.getLoadingStyles()}>
+          <div className="loading-spinner">
+            <div className="spinner-ring"></div>
+            <div className="loading-text">Loading Portfolio...</div>
+          </div>
+        </div>
+      )
+    }
+
+    if (error) {
+      return (
+        <div style={this.getErrorStyles()}>
+          <div className="error-content">
+            <h2>Something went wrong</h2>
+            <p>{error}</p>
+            <button onClick={() => this.setState({ error: null })}>
+              Try Again
+            </button>
+          </div>
+        </div>
+      )
+    }
 
     return (
       <ThemeProvider theme={theme}>
-        <div 
-          className={`portfolio-project ${theme}`}
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            color: 'var(--text-primary)',
-            minHeight: '100vh',
-            padding: '2rem',
-            transition: 'all 0.3s ease',
-            fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif'
-          }}
-          role="main"
-          aria-label="Employee Management System Portfolio Project"
-        >
-          {/* Global Styles */}
-          <style jsx>{`
-            .portfolio-project {
-              --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-              --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-              --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-              --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-              --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-              --border-radius: 0.75rem;
-              --border-radius-lg: 1rem;
-              --spacing-xs: 0.5rem;
-              --spacing-sm: 1rem;
-              --spacing-md: 1.5rem;
-              --spacing-lg: 2rem;
-              --spacing-xl: 3rem;
-            }
-            
-            .portfolio-project * {
-              box-sizing: border-box;
-            }
-            
-            .portfolio-project .animate-in {
-              animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            
-            @keyframes slideInUp {
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-            
-            .portfolio-project .stagger-1 { animation-delay: 0.1s; }
-            .portfolio-project .stagger-2 { animation-delay: 0.2s; }
-            .portfolio-project .stagger-3 { animation-delay: 0.3s; }
-            .portfolio-project .stagger-4 { animation-delay: 0.4s; }
-            
-            .portfolio-project .hover-scale {
-              transition: transform 0.2s ease, box-shadow 0.2s ease;
-            }
-            
-            .portfolio-project .hover-scale:hover {
-              transform: translateY(-2px) scale(1.02);
-              box-shadow: var(--shadow-xl);
-            }
-            
-            .portfolio-project .focus-visible:focus-visible {
-              outline: 2px solid var(--accent-primary);
-              outline-offset: 2px;
-              border-radius: var(--border-radius);
-            }
-            
-            @media (prefers-reduced-motion: reduce) {
-              .portfolio-project * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-              }
-            }
-          `}</style>
-
-          {/* Project Header */}
-          <ProjectHeader
-            title="Employee Management System"
-            subtitle="Full-Stack React Application with Modern Architecture"
-            theme={theme}
-            isEditing={isEditing}
+        <div className={`portfolio-container ${theme}-theme`} style={this.getContainerStyles()}>
+          {/* Header Section */}
+          <ProjectHeader 
             onThemeToggle={this.toggleTheme}
-            onEditToggle={this.toggleEditMode}
-            className={isLoaded ? 'animate-in' : ''}
-          />
-
-          {/* Project Stats */}
-          <ProjectStats
-            stats={stats}
-            metrics={projectMetrics}
             theme={theme}
-            className={isLoaded ? 'animate-in stagger-1' : ''}
-          />
-
-          {/* Search and Interactions */}
-          <ProjectInteractions
-            searchTerm={searchTerm}
             onSearch={this.handleSearch}
+            onFilterChange={this.handleFilterChange}
+            onSortChange={this.handleSortChange}
+            searchTerm={this.state.searchTerm}
+            filterCategory={this.state.filterCategory}
+            sortBy={this.state.sortBy}
+          />
+
+          {/* Stats Overview */}
+          <ProjectStats 
+            projects={this.state.projects}
+            filteredProjects={this.state.filteredProjects}
             theme={theme}
-            isEditing={isEditing}
-            featuresCount={filteredFeatures.length}
-            className={isLoaded ? 'animate-in stagger-2' : ''}
           />
 
           {/* Feature Showcase */}
-          <FeatureShowcase
-            features={filteredFeatures}
-            activeFeature={activeFeature}
-            onFeatureClick={this.handleFeatureClick}
-            onFeatureUpdate={this.updateFeature}
+          <FeatureShowcase 
+            projects={this.state.filteredProjects}
+            selectedProject={this.state.selectedProject}
+            onProjectSelect={(project) => this.setState({ selectedProject: project })}
             theme={theme}
-            isEditing={isEditing}
-            className={isLoaded ? 'animate-in stagger-3' : ''}
+            viewMode={this.state.viewMode}
+            onViewModeChange={(viewMode) => this.setState({ viewMode })}
           />
 
-          {/* Tech Stack */}
-          <TechStack
-            features={this.state.features}
+          {/* Interactive Controls */}
+          <ProjectInteractions 
+            projects={this.state.projects}
+            onProjectUpdate={(projects) => this.setState({ projects, filteredProjects: this.filterAndSortProjects() })}
             theme={theme}
-            className={isLoaded ? 'animate-in stagger-4' : ''}
+            settings={this.state.settings}
+            onSettingsChange={(settings) => this.setState({ settings })}
           />
 
-          {/* Keyboard Shortcuts Help */}
-          <div
-            style={{
-              position: 'fixed',
-              bottom: '1rem',
-              right: '1rem',
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--border-radius)',
-              padding: '0.75rem',
-              fontSize: '0.75rem',
-              color: 'var(--text-muted)',
-              boxShadow: 'var(--shadow-md)',
-              opacity: 0.8,
-              transition: 'var(--transition)',
-              zIndex: 1000
-            }}
-            role="complementary"
-            aria-label="Keyboard shortcuts"
-          >
-            <div>🎨 Ctrl+T: Toggle Theme</div>
-            <div>✏️ Ctrl+E: Edit Mode</div>
-            <div>🔍 Esc: Clear Search</div>
-          </div>
+          {/* Custom Styles */}
+          <style jsx>{this.getCustomStyles()}</style>
         </div>
       </ThemeProvider>
     )
   }
-}
 
-export default PortfolioProject
+  // Styling methods
+  getContainerStyles = () => ({
+    minHeight: '100vh',
+    background: this.state.theme === 'dark' 
+      ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+      : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+    padding: '20px',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    color: this.state.theme === 'dark' ? '#ffffff' : '#333333',
+    transition: 'all 0.3s ease'
+  })
+
+  getLoadingStyles = () => ({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    background: this.state.theme === 'dark' 
+      ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+      : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+    color: this.state.theme === 'dark' ? '#ffffff' : '#333333'
+  })
+
+  getErrorStyles = () => ({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    background: this.state.theme === 'dark' 
+      ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+      : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+    color: this.state.theme === 'dark' ? '#ffffff' : '#333333'
+  })
+
+  getCustomStyles = () => `
+    .loading-spinner {
+      text-align: center;
+    }
+
+    .spinner-ring {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .loading-text {
+      font-size: 18px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .portfolio-container {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .portfolio-container {
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .portfolio-container {
+        padding: 5px;
+      }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  `
+}

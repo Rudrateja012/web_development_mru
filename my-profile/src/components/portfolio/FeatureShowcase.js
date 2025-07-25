@@ -1,740 +1,1123 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
+import { useTheme } from './ThemeProvider'
 
-const FeatureShowcase = ({ 
-  features, 
-  activeFeature, 
-  onFeatureClick, 
-  onFeatureUpdate, 
-  theme, 
-  isEditing,
-  className = '' 
+const FeatureShowcase = ({
+  projects,
+  selectedProject,
+  onProjectSelect,
+  theme,
+  viewMode,
+  onViewModeChange
 }) => {
-  const [hoveredFeature, setHoveredFeature] = useState(null)
-  const [expandedFeature, setExpandedFeature] = useState(null)
-  const detailsRef = useRef(null)
+  const { theme: themeConfig } = useTheme()
+  const [hoveredProject, setHoveredProject] = useState(null)
+  const [imageLoadStates, setImageLoadStates] = useState({})
+  const [expandedProject, setExpandedProject] = useState(null)
+  const showcaseRef = useRef(null)
 
-  useEffect(() => {
-    if (activeFeature && detailsRef.current) {
-      detailsRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-      })
-    }
-  }, [activeFeature])
+  // View mode options
+  const viewModes = [
+    { value: 'grid', label: 'Grid', icon: '⊞' },
+    { value: 'list', label: 'List', icon: '☰' },
+    { value: 'card', label: 'Cards', icon: '◧' }
+  ]
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'active':
-        return 'var(--success)'
-      case 'beta':
-        return 'var(--warning)'
-      case 'development':
-        return 'var(--accent-primary)'
-      case 'planning':
-        return 'var(--text-muted)'
-      default:
-        return 'var(--text-secondary)'
-    }
+  // Handle image loading states
+  const handleImageLoad = (projectId) => {
+    setImageLoadStates(prev => ({
+      ...prev,
+      [projectId]: 'loaded'
+    }))
   }
 
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'active':
-        return '✅'
-      case 'beta':
-        return '🧪'
-      case 'development':
-        return '🚧'
-      case 'planning':
-        return '📋'
-      default:
-        return '⚡'
-    }
+  const handleImageError = (projectId) => {
+    setImageLoadStates(prev => ({
+      ...prev,
+      [projectId]: 'error'
+    }))
   }
 
-  const handleFeatureEdit = (featureId, field, value) => {
-    if (isEditing) {
-      onFeatureUpdate(featureId, { [field]: value })
+  // Get technology color
+  const getTechColor = (tech) => {
+    const colors = {
+      'React': '#61dafb',
+      'Node.js': '#68a063',
+      'MongoDB': '#4db33d',
+      'Vue.js': '#4fc08d',
+      'Express': '#ffffff',
+      'PostgreSQL': '#336791',
+      'React Native': '#61dafb',
+      'Firebase': '#ffca28',
+      'Socket.io': '#010101',
+      'Chart.js': '#ff6384',
+      'Redux': '#764abc',
+      'Expo': '#000020'
     }
+    return colors[tech] || themeConfig.primary
   }
 
-  const toggleExpanded = (featureId) => {
-    setExpandedFeature(expandedFeature === featureId ? null : featureId)
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Ongoing'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short' 
+    })
   }
 
-  const handleDemoClick = (demoUrl, e) => {
-    e.stopPropagation()
-    if (demoUrl && demoUrl !== '#') {
-      // Navigate to demo
-      window.location.href = demoUrl
+  // Get status badge style
+  const getStatusBadgeStyle = (status) => {
+    const styles = {
+      'completed': {
+        background: `${themeConfig.success}20`,
+        color: themeConfig.success,
+        border: `1px solid ${themeConfig.success}40`
+      },
+      'in-progress': {
+        background: `${themeConfig.warning}20`,
+        color: themeConfig.warning,
+        border: `1px solid ${themeConfig.warning}40`
+      },
+      'planning': {
+        background: `${themeConfig.info}20`,
+        color: themeConfig.info,
+        border: `1px solid ${themeConfig.info}40`
+      }
     }
+    return styles[status] || styles.planning
   }
 
-  const handleGithubClick = (githubUrl, e) => {
-    e.stopPropagation()
-    if (githubUrl && githubUrl !== '#') {
-      window.open(githubUrl, '_blank', 'noopener,noreferrer')
-    }
+  // Handle project expansion
+  const toggleProjectExpansion = (projectId) => {
+    setExpandedProject(expandedProject === projectId ? null : projectId)
   }
 
   return (
-    <section 
-      className={`feature-showcase ${className}`}
-      style={{
-        marginBottom: 'var(--spacing-xl)'
-      }}
-      aria-labelledby="features-heading"
-    >
-      <h2 
-        id="features-heading"
-        style={{
-          fontSize: '1.75rem',
-          fontWeight: '700',
-          color: 'var(--text-primary)',
-          marginBottom: 'var(--spacing-lg)',
-          textAlign: 'center',
-          background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}
-      >
-        🚀 Feature Showcase
-      </h2>
-
-      {features.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: 'var(--spacing-xl)',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--border-radius-lg)',
-            color: 'var(--text-muted)'
-          }}
-          role="status"
-        >
-          <div style={{ fontSize: '3rem', marginBottom: 'var(--spacing-md)' }}>🔍</div>
-          <h3 style={{ margin: '0 0 var(--spacing-sm) 0', color: 'var(--text-secondary)' }}>
-            No features found
-          </h3>
-          <p style={{ margin: 0 }}>
-            Try adjusting your search terms or browse all features
+    <div style={containerStyles()}>
+      {/* Header with View Mode Toggle */}
+      <div style={headerStyles()}>
+        <div>
+          <h2 style={titleStyles()}>🚀 Featured Projects</h2>
+          <p style={subtitleStyles()}>
+            Showcasing {projects.length} innovative solutions
           </p>
         </div>
-      ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: 'var(--spacing-lg)',
-            marginBottom: activeFeature ? 'var(--spacing-xl)' : 0
-          }}
-        >
-          {features.map((feature, index) => (
-            <article
-              key={feature.id}
-              style={{
-                background: 'var(--bg-secondary)',
-                border: activeFeature === feature.id 
-                  ? '2px solid var(--accent-primary)' 
-                  : '1px solid var(--border-color)',
-                borderRadius: 'var(--border-radius-lg)',
-                padding: 'var(--spacing-lg)',
-                boxShadow: hoveredFeature === feature.id 
-                  ? 'var(--shadow-xl)' 
-                  : 'var(--shadow-md)',
-                transition: 'var(--transition)',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-                transform: hoveredFeature === feature.id 
-                  ? 'translateY(-4px) scale(1.02)' 
-                  : 'translateY(0) scale(1)'
-              }}
-              onMouseEnter={() => setHoveredFeature(feature.id)}
-              onMouseLeave={() => setHoveredFeature(null)}
-              onClick={() => onFeatureClick(feature.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  onFeatureClick(feature.id)
-                }
-              }}
-              tabIndex="0"
-              role="button"
-              aria-expanded={activeFeature === feature.id}
-              aria-describedby={`feature-${feature.id}-desc`}
+        
+        <div style={viewModeToggleStyles()}>
+          {viewModes.map((mode) => (
+            <button
+              key={mode.value}
+              onClick={() => onViewModeChange(mode.value)}
+              style={viewModeButtonStyles(mode.value === viewMode)}
+              title={`Switch to ${mode.label} view`}
             >
-              {/* Status Indicator */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'var(--spacing-sm)',
-                  right: 'var(--spacing-sm)',
-                  background: getStatusColor(feature.status),
-                  color: 'white',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '1rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.25rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}
-                aria-label={`Status: ${feature.status}`}
-              >
-                <span>{getStatusIcon(feature.status)}</span>
-                {feature.status}
-              </div>
-
-              {/* Feature Icon */}
-              <div
-                style={{
-                  fontSize: '3rem',
-                  marginBottom: 'var(--spacing-md)',
-                  textAlign: 'center',
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
-                }}
-                aria-hidden="true"
-              >
-                {feature.icon}
-              </div>
-
-              {/* Feature Title */}
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={feature.title}
-                  onChange={(e) => handleFeatureEdit(feature.id, 'title', e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                    background: 'transparent',
-                    border: '2px dashed var(--border-color)',
-                    borderRadius: 'var(--border-radius)',
-                    padding: 'var(--spacing-xs)',
-                    color: 'var(--text-primary)',
-                    width: '100%',
-                    marginBottom: 'var(--spacing-md)',
-                    fontFamily: 'inherit'
-                  }}
-                  aria-label="Edit feature title"
-                />
-              ) : (
-                <h3
-                  style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                    color: 'var(--text-primary)',
-                    margin: '0 0 var(--spacing-md) 0',
-                    textAlign: 'center',
-                    lineHeight: '1.3'
-                  }}
-                >
-                  {feature.title}
-                </h3>
-              )}
-
-              {/* Feature Description */}
-              {isEditing ? (
-                <textarea
-                  value={feature.description}
-                  onChange={(e) => handleFeatureEdit(feature.id, 'description', e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    fontSize: '1rem',
-                    background: 'transparent',
-                    border: '2px dashed var(--border-color)',
-                    borderRadius: 'var(--border-radius)',
-                    padding: 'var(--spacing-sm)',
-                    color: 'var(--text-secondary)',
-                    width: '100%',
-                    minHeight: '4rem',
-                    resize: 'vertical',
-                    marginBottom: 'var(--spacing-md)',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.6'
-                  }}
-                  aria-label="Edit feature description"
-                />
-              ) : (
-                <p
-                  id={`feature-${feature.id}-desc`}
-                  style={{
-                    fontSize: '1rem',
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.6',
-                    margin: '0 0 var(--spacing-md) 0'
-                  }}
-                >
-                  {feature.description}
-                </p>
-              )}
-
-              {/* Progress Bar */}
-              <div
-                style={{
-                  marginBottom: 'var(--spacing-md)'
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 'var(--spacing-xs)',
-                    fontSize: '0.875rem'
-                  }}
-                >
-                  <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>
-                    Completion
-                  </span>
-                  <span style={{ 
-                    color: 'var(--text-primary)', 
-                    fontWeight: '700',
-                    fontFamily: '"SF Mono", "Monaco", "Consolas", monospace'
-                  }}>
-                    {feature.completion}%
-                  </span>
-                </div>
-                <div
-                  style={{
-                    background: 'var(--bg-tertiary)',
-                    borderRadius: '0.5rem',
-                    height: '8px',
-                    overflow: 'hidden'
-                  }}
-                  role="progressbar"
-                  aria-valuenow={feature.completion}
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  aria-label={`${feature.title} completion progress`}
-                >
-                  <div
-                    style={{
-                      background: `linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))`,
-                      height: '100%',
-                      width: `${feature.completion}%`,
-                      transition: 'width 0.6s ease-out',
-                      borderRadius: '0.5rem'
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Technologies */}
-              <div
-                style={{
-                  marginBottom: 'var(--spacing-md)'
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    color: 'var(--text-secondary)',
-                    margin: '0 0 var(--spacing-xs) 0',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}
-                >
-                  Technologies
-                </h4>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 'var(--spacing-xs)'
-                  }}
-                >
-                  {feature.technologies.map((tech, techIndex) => (
-                    <span
-                      key={techIndex}
-                      style={{
-                        background: 'var(--bg-primary)',
-                        color: 'var(--text-primary)',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '500',
-                        border: '1px solid var(--border-color)',
-                        transition: 'var(--transition)'
-                      }}
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Highlights */}
-              {feature.highlights && feature.highlights.length > 0 && (
-                <div
-                  style={{
-                    marginBottom: 'var(--spacing-md)'
-                  }}
-                >
-                  <h4
-                    style={{
-                      fontSize: '0.875rem',
-                      fontWeight: '600',
-                      color: 'var(--text-secondary)',
-                      margin: '0 0 var(--spacing-xs) 0',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em'
-                    }}
-                  >
-                    Key Features
-                  </h4>
-                  <ul
-                    style={{
-                      margin: 0,
-                      padding: 0,
-                      listStyle: 'none'
-                    }}
-                  >
-                    {feature.highlights.map((highlight, highlightIndex) => (
-                      <li
-                        key={highlightIndex}
-                        style={{
-                          fontSize: '0.875rem',
-                          color: 'var(--text-secondary)',
-                          marginBottom: '0.25rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--spacing-xs)'
-                        }}
-                      >
-                        <span style={{ color: 'var(--success)', fontSize: '0.75rem' }}>●</span>
-                        {highlight}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 'var(--spacing-sm)',
-                  marginTop: 'auto'
-                }}
-              >
-                <button
-                  onClick={(e) => handleDemoClick(feature.demoUrl, e)}
-                  disabled={!feature.demoUrl || feature.demoUrl === '#'}
-                  style={{
-                    flex: 1,
-                    background: feature.demoUrl && feature.demoUrl !== '#' 
-                      ? 'var(--accent-primary)' 
-                      : 'var(--bg-tertiary)',
-                    color: feature.demoUrl && feature.demoUrl !== '#' 
-                      ? 'white' 
-                      : 'var(--text-muted)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--border-radius)',
-                    padding: '0.75rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    cursor: feature.demoUrl && feature.demoUrl !== '#' 
-                      ? 'pointer' 
-                      : 'not-allowed',
-                    transition: 'var(--transition)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem'
-                  }}
-                  onMouseOver={(e) => {
-                    if (feature.demoUrl && feature.demoUrl !== '#') {
-                      e.target.style.background = 'var(--accent-secondary)'
-                      e.target.style.transform = 'translateY(-1px)'
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (feature.demoUrl && feature.demoUrl !== '#') {
-                      e.target.style.background = 'var(--accent-primary)'
-                      e.target.style.transform = 'translateY(0)'
-                    }
-                  }}
-                  aria-label={`View ${feature.title} demo`}
-                >
-                  🚀 Demo
-                </button>
-
-                <button
-                  onClick={(e) => handleGithubClick(feature.githubUrl, e)}
-                  disabled={!feature.githubUrl || feature.githubUrl === '#'}
-                  style={{
-                    flex: 1,
-                    background: 'transparent',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--border-radius)',
-                    padding: '0.75rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    cursor: feature.githubUrl && feature.githubUrl !== '#' 
-                      ? 'pointer' 
-                      : 'not-allowed',
-                    transition: 'var(--transition)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    opacity: feature.githubUrl && feature.githubUrl !== '#' ? 1 : 0.5
-                  }}
-                  onMouseOver={(e) => {
-                    if (feature.githubUrl && feature.githubUrl !== '#') {
-                      e.target.style.background = 'var(--bg-tertiary)'
-                      e.target.style.transform = 'translateY(-1px)'
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (feature.githubUrl && feature.githubUrl !== '#') {
-                      e.target.style.background = 'transparent'
-                      e.target.style.transform = 'translateY(0)'
-                    }
-                  }}
-                  aria-label={`View ${feature.title} source code`}
-                >
-                  💻 Code
-                </button>
-              </div>
-
-              {/* Expand Button */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  toggleExpanded(feature.id)
-                }}
-                style={{
-                  position: 'absolute',
-                  bottom: 'var(--spacing-sm)',
-                  right: 'var(--spacing-sm)',
-                  background: expandedFeature === feature.id 
-                    ? 'var(--accent-primary)' 
-                    : 'var(--bg-tertiary)',
-                  color: expandedFeature === feature.id ? 'white' : 'var(--text-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '50%',
-                  width: '2rem',
-                  height: '2rem',
-                  cursor: 'pointer',
-                  transition: 'var(--transition)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.875rem'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.transform = 'scale(1.1)'
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.transform = 'scale(1)'
-                }}
-                aria-label={expandedFeature === feature.id ? 'Collapse details' : 'Expand details'}
-              >
-                {expandedFeature === feature.id ? '▲' : '▼'}
-              </button>
-
-              {/* Expanded Details */}
-              {expandedFeature === feature.id && (
-                <div
-                  style={{
-                    marginTop: 'var(--spacing-lg)',
-                    padding: 'var(--spacing-md)',
-                    background: 'var(--bg-primary)',
-                    borderRadius: 'var(--border-radius)',
-                    border: '1px solid var(--border-color)'
-                  }}
-                >
-                  <h4
-                    style={{
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      color: 'var(--text-primary)',
-                      marginBottom: 'var(--spacing-sm)'
-                    }}
-                  >
-                    📋 Detailed Information
-                  </h4>
-                  <div
-                    style={{
-                      fontSize: '0.875rem',
-                      color: 'var(--text-secondary)',
-                      lineHeight: '1.6'
-                    }}
-                  >
-                    <p>
-                      This feature represents a core component of the Employee Management System,
-                      showcasing modern web development practices and user-centered design principles.
-                    </p>
-                    <p style={{ margin: '0.5rem 0' }}>
-                      <strong>Implementation Details:</strong> Built with React functional components,
-                      utilizing hooks for state management and context for data sharing across the application.
-                    </p>
-                    <p style={{ margin: 0 }}>
-                      <strong>Performance:</strong> Optimized for fast rendering and smooth user interactions
-                      with lazy loading and code splitting techniques.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </article>
+              <span style={{ fontSize: '16px' }}>{mode.icon}</span>
+              <span>{mode.label}</span>
+            </button>
           ))}
         </div>
-      )}
+      </div>
 
-      {/* Feature Detail Modal/Expanded View */}
-      {activeFeature && (
-        <div
-          ref={detailsRef}
-          style={{
-            background: 'var(--bg-secondary)',
-            border: '2px solid var(--accent-primary)',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: 'var(--spacing-xl)',
-            boxShadow: 'var(--shadow-xl)',
-            marginTop: 'var(--spacing-xl)',
-            animation: 'slideInUp 0.3s ease-out'
-          }}
-          role="dialog"
-          aria-labelledby="feature-detail-title"
-          aria-modal="true"
-        >
-          {(() => {
-            const feature = features.find(f => f.id === activeFeature)
-            if (!feature) return null
+      {/* Projects Showcase */}
+      <div 
+        ref={showcaseRef}
+        style={showcaseGridStyles(viewMode)}
+        className={`showcase-${viewMode}`}
+      >
+        {projects.map((project, index) => (
+          <div
+            key={project.id}
+            style={projectCardStyles(viewMode, index)}
+            className={`project-card ${viewMode}-mode`}
+            onMouseEnter={() => setHoveredProject(project.id)}
+            onMouseLeave={() => setHoveredProject(null)}
+            onClick={() => onProjectSelect(project)}
+          >
+            {/* Project Image */}
+            {viewMode !== 'list' && (
+              <div style={imageContainerStyles(viewMode)}>
+                {imageLoadStates[project.id] !== 'loaded' && (
+                  <div style={imagePlaceholderStyles()}>
+                    <span style={{ fontSize: '48px' }}>🖼️</span>
+                    <p>Loading...</p>
+                  </div>
+                )}
+                <img
+                  src={project.image || '/api/placeholder/400/250'}
+                  alt={project.title}
+                  style={imageStyles(imageLoadStates[project.id] === 'loaded')}
+                  onLoad={() => handleImageLoad(project.id)}
+                  onError={() => handleImageError(project.id)}
+                />
+                
+                {/* Featured Badge */}
+                {project.featured && (
+                  <div style={featuredBadgeStyles()}>
+                    <span>⭐</span>
+                    <span>Featured</span>
+                  </div>
+                )}
 
-            return (
-              <>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 'var(--spacing-lg)'
-                  }}
-                >
-                  <h3
-                    id="feature-detail-title"
-                    style={{
-                      fontSize: '1.75rem',
-                      fontWeight: '700',
-                      color: 'var(--text-primary)',
-                      margin: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 'var(--spacing-sm)'
-                    }}
-                  >
-                    <span style={{ fontSize: '2rem' }}>{feature.icon}</span>
-                    {feature.title}
-                  </h3>
-
-                  <button
-                    onClick={() => onFeatureClick(null)}
-                    style={{
-                      background: 'var(--bg-tertiary)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '50%',
-                      width: '2.5rem',
-                      height: '2.5rem',
-                      cursor: 'pointer',
-                      transition: 'var(--transition)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.2rem',
-                      color: 'var(--text-primary)'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = 'var(--error)'
-                      e.target.style.color = 'white'
-                      e.target.style.transform = 'scale(1.1)'
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = 'var(--bg-tertiary)'
-                      e.target.style.color = 'var(--text-primary)'
-                      e.target.style.transform = 'scale(1)'
-                    }}
-                    aria-label="Close feature details"
-                  >
-                    ✕
-                  </button>
+                {/* Status Badge */}
+                <div style={{
+                  ...statusBadgeStyles(),
+                  ...getStatusBadgeStyle(project.status)
+                }}>
+                  {project.status === 'completed' && '✅'}
+                  {project.status === 'in-progress' && '🚧'}
+                  {project.status === 'planning' && '📋'}
+                  <span style={{ marginLeft: '4px', textTransform: 'capitalize' }}>
+                    {project.status.replace('-', ' ')}
+                  </span>
                 </div>
 
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    gap: 'var(--spacing-lg)'
-                  }}
-                >
-                  <div>
-                    <h4 style={{ 
-                      fontSize: '1.25rem', 
-                      fontWeight: '600', 
-                      color: 'var(--text-primary)',
-                      marginBottom: 'var(--spacing-md)'
-                    }}>
-                      📄 Description
-                    </h4>
-                    <p style={{ 
-                      fontSize: '1rem', 
-                      color: 'var(--text-secondary)', 
-                      lineHeight: '1.6',
-                      margin: 0
-                    }}>
-                      {feature.description}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 style={{ 
-                      fontSize: '1.25rem', 
-                      fontWeight: '600', 
-                      color: 'var(--text-primary)',
-                      marginBottom: 'var(--spacing-md)'
-                    }}>
-                      🛠️ Technology Stack
-                    </h4>
-                    <div style={{ 
-                      display: 'flex', 
-                      flexWrap: 'wrap', 
-                      gap: 'var(--spacing-sm)' 
-                    }}>
-                      {feature.technologies.map((tech, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            background: 'var(--accent-primary)',
-                            color: 'white',
-                            padding: '0.5rem 1rem',
-                            borderRadius: 'var(--border-radius)',
-                            fontSize: '0.875rem',
-                            fontWeight: '600'
+                {/* Hover Overlay */}
+                {hoveredProject === project.id && (
+                  <div style={hoverOverlayStyles()}>
+                    <div style={hoverContentStyles()}>
+                      <button style={actionButtonStyles()}>
+                        <span>👁️</span>
+                        <span>View Details</span>
+                      </button>
+                      {project.demo && (
+                        <button 
+                          style={actionButtonStyles()}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            window.open(project.demo, '_blank')
                           }}
                         >
-                          {tech}
-                        </span>
-                      ))}
+                          <span>🚀</span>
+                          <span>Live Demo</span>
+                        </button>
+                      )}
+                      {project.github && (
+                        <button 
+                          style={actionButtonStyles()}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            window.open(project.github, '_blank')
+                          }}
+                        >
+                          <span>💻</span>
+                          <span>GitHub</span>
+                        </button>
+                      )}
                     </div>
                   </div>
+                )}
+              </div>
+            )}
+
+            {/* Project Content */}
+            <div style={contentStyles(viewMode)}>
+              {/* Header */}
+              <div style={contentHeaderStyles()}>
+                <h3 style={projectTitleStyles(viewMode)}>{project.title}</h3>
+                {viewMode === 'list' && (
+                  <div style={{
+                    ...statusBadgeStyles(),
+                    ...getStatusBadgeStyle(project.status),
+                    position: 'static',
+                    marginLeft: 'auto'
+                  }}>
+                    {project.status === 'completed' && '✅'}
+                    {project.status === 'in-progress' && '🚧'}
+                    {project.status === 'planning' && '📋'}
+                    <span style={{ marginLeft: '4px', textTransform: 'capitalize' }}>
+                      {project.status.replace('-', ' ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <p style={descriptionStyles(viewMode)}>
+                {project.description}
+              </p>
+
+              {/* Technologies */}
+              <div style={technologiesStyles()}>
+                {project.technologies?.slice(0, viewMode === 'list' ? 4 : 6).map((tech, techIndex) => (
+                  <span
+                    key={techIndex}
+                    style={{
+                      ...techBadgeStyles(),
+                      background: `${getTechColor(tech)}20`,
+                      color: getTechColor(tech),
+                      border: `1px solid ${getTechColor(tech)}40`
+                    }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+                {project.technologies?.length > (viewMode === 'list' ? 4 : 6) && (
+                  <span style={moreTechStyles()}>
+                    +{project.technologies.length - (viewMode === 'list' ? 4 : 6)} more
+                  </span>
+                )}
+              </div>
+
+              {/* Metrics */}
+              <div style={metricsStyles()}>
+                <div style={metricItemStyles()}>
+                  <span>⭐</span>
+                  <span>{project.metrics?.stars || 0}</span>
                 </div>
-              </>
-            )
-          })()}
+                <div style={metricItemStyles()}>
+                  <span>👁️</span>
+                  <span>{project.metrics?.views || 0}</span>
+                </div>
+                <div style={metricItemStyles()}>
+                  <span>⬇️</span>
+                  <span>{project.metrics?.downloads || 0}</span>
+                </div>
+                <div style={metricItemStyles()}>
+                  <span>📅</span>
+                  <span>{formatDate(project.startDate)} - {formatDate(project.endDate)}</span>
+                </div>
+              </div>
+
+              {/* Expandable Details */}
+              {viewMode !== 'grid' && (
+                <div style={expandableDetailsStyles()}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleProjectExpansion(project.id)
+                    }}
+                    style={expandButtonStyles()}
+                  >
+                    <span>📋</span>
+                    <span>{expandedProject === project.id ? 'Hide' : 'Show'} Details</span>
+                    <span style={expandIconStyles(expandedProject === project.id)}>
+                      {expandedProject === project.id ? '▲' : '▼'}
+                    </span>
+                  </button>
+
+                  {expandedProject === project.id && (
+                    <div style={expandedContentStyles()}>
+                      {/* Features */}
+                      {project.features && (
+                        <div style={featureSectionStyles()}>
+                          <h4 style={featureTitleStyles()}>✨ Key Features</h4>
+                          <ul style={featureListStyles()}>
+                            {project.features.map((feature, featureIndex) => (
+                              <li key={featureIndex} style={featureItemStyles()}>
+                                <span style={featureBulletStyles()}>▸</span>
+                                <span>{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Team */}
+                      {project.team && project.team.length > 0 && (
+                        <div style={featureSectionStyles()}>
+                          <h4 style={featureTitleStyles()}>👥 Team</h4>
+                          <div style={teamListStyles()}>
+                            {project.team.map((member, memberIndex) => (
+                              <span key={memberIndex} style={teamMemberStyles()}>
+                                👤 {member}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tags */}
+                      {project.tags && project.tags.length > 0 && (
+                        <div style={featureSectionStyles()}>
+                          <h4 style={featureTitleStyles()}>🏷️ Tags</h4>
+                          <div style={tagsContainerStyles()}>
+                            {project.tags.map((tag, tagIndex) => (
+                              <span key={tagIndex} style={tagStyles()}>
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Action Buttons for List/Card View */}
+              {viewMode !== 'grid' && (
+                <div style={actionButtonsStyles()}>
+                  <button 
+                    style={primaryActionButtonStyles()}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onProjectSelect(project)
+                    }}
+                  >
+                    <span>👁️</span>
+                    <span>View Details</span>
+                  </button>
+                  {project.demo && (
+                    <button 
+                      style={secondaryActionButtonStyles()}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(project.demo, '_blank')
+                      }}
+                    >
+                      <span>🚀</span>
+                      <span>Demo</span>
+                    </button>
+                  )}
+                  {project.github && (
+                    <button 
+                      style={secondaryActionButtonStyles()}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(project.github, '_blank')
+                      }}
+                    >
+                      <span>💻</span>
+                      <span>Code</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {projects.length === 0 && (
+        <div style={emptyStateStyles()}>
+          <div style={emptyIconStyles()}>🔍</div>
+          <h3 style={emptyTitleStyles()}>No projects found</h3>
+          <p style={emptyDescriptionStyles()}>
+            Try adjusting your search criteria or filters to find more projects.
+          </p>
         </div>
       )}
-    </section>
+
+      {/* Custom Styles */}
+      <style jsx>{getCustomStyles()}</style>
+    </div>
   )
+
+  // Styling functions
+  function containerStyles() {
+    return {
+      background: themeConfig.cardBackground,
+      backdropFilter: themeConfig.backdropBlur,
+      border: `1px solid ${themeConfig.border}`,
+      borderRadius: '20px',
+      padding: '24px',
+      marginBottom: '24px',
+      boxShadow: themeConfig.shadowLight,
+      transition: 'all 0.3s ease'
+    }
+  }
+
+  function headerStyles() {
+    return {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: '24px',
+      gap: '20px',
+      flexWrap: 'wrap'
+    }
+  }
+
+  function titleStyles() {
+    return {
+      margin: 0,
+      fontSize: '28px',
+      fontWeight: '700',
+      background: themeConfig.gradient,
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      lineHeight: '1.2',
+      marginBottom: '8px'
+    }
+  }
+
+  function subtitleStyles() {
+    return {
+      margin: 0,
+      fontSize: '16px',
+      color: themeConfig.textSecondary,
+      fontWeight: '400'
+    }
+  }
+
+  function viewModeToggleStyles() {
+    return {
+      display: 'flex',
+      gap: '8px',
+      background: themeConfig.surface,
+      border: `1px solid ${themeConfig.border}`,
+      borderRadius: '12px',
+      padding: '4px',
+      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+    }
+  }
+
+  function viewModeButtonStyles(isActive) {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px 16px',
+      background: isActive ? themeConfig.primary : 'transparent',
+      color: isActive ? '#ffffff' : themeConfig.text,
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      fontSize: '14px',
+      fontWeight: '500',
+      outline: 'none'
+    }
+  }
+
+  function showcaseGridStyles(viewMode) {
+    const gridStyles = {
+      grid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+        gap: '20px'
+      },
+      list: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      },
+      card: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gap: '24px'
+      }
+    }
+    return gridStyles[viewMode] || gridStyles.grid
+  }
+
+  function projectCardStyles(viewMode, index) {
+    const baseStyle = {
+      background: themeConfig.glassmorphism,
+      border: `1px solid ${themeConfig.border}`,
+      borderRadius: viewMode === 'list' ? '12px' : '16px',
+      overflow: 'hidden',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      position: 'relative',
+      animation: `slideIn 0.6s ease-out ${index * 0.1}s both`
+    }
+
+    const modeStyles = {
+      grid: {
+        flexDirection: 'column'
+      },
+      list: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        padding: '16px'
+      },
+      card: {
+        flexDirection: 'column',
+        minHeight: '400px'
+      }
+    }
+
+    return { ...baseStyle, ...modeStyles[viewMode] }
+  }
+
+  function imageContainerStyles(viewMode) {
+    return {
+      position: 'relative',
+      width: viewMode === 'list' ? '200px' : '100%',
+      height: viewMode === 'list' ? '120px' : '200px',
+      overflow: 'hidden',
+      flexShrink: 0,
+      borderRadius: viewMode === 'list' ? '8px' : '0'
+    }
+  }
+
+  function imagePlaceholderStyles() {
+    return {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: themeConfig.surface,
+      color: themeConfig.textMuted,
+      fontSize: '14px',
+      zIndex: 1
+    }
+  }
+
+  function imageStyles(isLoaded) {
+    return {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      opacity: isLoaded ? 1 : 0,
+      transition: 'opacity 0.3s ease'
+    }
+  }
+
+  function featuredBadgeStyles() {
+    return {
+      position: 'absolute',
+      top: '12px',
+      left: '12px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px',
+      padding: '4px 8px',
+      background: `${themeConfig.accent}20`,
+      color: themeConfig.accent,
+      border: `1px solid ${themeConfig.accent}40`,
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '600',
+      backdropFilter: 'blur(10px)',
+      zIndex: 2
+    }
+  }
+
+  function statusBadgeStyles() {
+    return {
+      position: 'absolute',
+      top: '12px',
+      right: '12px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px',
+      padding: '4px 8px',
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '600',
+      backdropFilter: 'blur(10px)',
+      zIndex: 2
+    }
+  }
+
+  function hoverOverlayStyles() {
+    return {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0, 0, 0, 0.8)',
+      backdropFilter: 'blur(5px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 3,
+      animation: 'fadeIn 0.3s ease-out'
+    }
+  }
+
+  function hoverContentStyles() {
+    return {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      alignItems: 'center'
+    }
+  }
+
+  function actionButtonStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '10px 16px',
+      background: themeConfig.glassmorphism,
+      border: `1px solid ${themeConfig.border}`,
+      borderRadius: '8px',
+      color: '#ffffff',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      fontSize: '14px',
+      fontWeight: '500',
+      outline: 'none',
+      backdropFilter: 'blur(10px)'
+    }
+  }
+
+  function contentStyles(viewMode) {
+    return {
+      padding: viewMode === 'list' ? '0 0 0 16px' : '20px',
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px'
+    }
+  }
+
+  function contentHeaderStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: '12px'
+    }
+  }
+
+  function projectTitleStyles(viewMode) {
+    return {
+      margin: 0,
+      fontSize: viewMode === 'list' ? '18px' : '20px',
+      fontWeight: '600',
+      color: themeConfig.text,
+      lineHeight: '1.3',
+      flex: 1
+    }
+  }
+
+  function descriptionStyles(viewMode) {
+    return {
+      margin: 0,
+      fontSize: '14px',
+      color: themeConfig.textSecondary,
+      lineHeight: '1.5',
+      display: '-webkit-box',
+      WebkitLineClamp: viewMode === 'list' ? 2 : 3,
+      WebkitBoxOrient: 'vertical',
+      overflow: 'hidden'
+    }
+  }
+
+  function technologiesStyles() {
+    return {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '6px'
+    }
+  }
+
+  function techBadgeStyles() {
+    return {
+      padding: '4px 8px',
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '500',
+      transition: 'all 0.2s ease'
+    }
+  }
+
+  function moreTechStyles() {
+    return {
+      padding: '4px 8px',
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '500',
+      color: themeConfig.textMuted,
+      background: themeConfig.border + '40',
+      border: `1px solid ${themeConfig.border}`
+    }
+  }
+
+  function metricsStyles() {
+    return {
+      display: 'flex',
+      gap: '16px',
+      flexWrap: 'wrap',
+      marginTop: '8px'
+    }
+  }
+
+  function metricItemStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px',
+      fontSize: '12px',
+      color: themeConfig.textMuted,
+      fontWeight: '500'
+    }
+  }
+
+  function expandableDetailsStyles() {
+    return {
+      marginTop: '12px',
+      borderTop: `1px solid ${themeConfig.border}`,
+      paddingTop: '12px'
+    }
+  }
+
+  function expandButtonStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      width: '100%',
+      padding: '8px 0',
+      background: 'none',
+      border: 'none',
+      color: themeConfig.primary,
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      outline: 'none',
+      justifyContent: 'flex-start',
+      transition: 'all 0.3s ease'
+    }
+  }
+
+  function expandIconStyles(isExpanded) {
+    return {
+      marginLeft: 'auto',
+      fontSize: '12px',
+      transition: 'transform 0.3s ease',
+      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
+    }
+  }
+
+  function expandedContentStyles() {
+    return {
+      marginTop: '12px',
+      animation: 'slideDown 0.3s ease-out'
+    }
+  }
+
+  function featureSectionStyles() {
+    return {
+      marginBottom: '16px'
+    }
+  }
+
+  function featureTitleStyles() {
+    return {
+      margin: '0 0 8px 0',
+      fontSize: '14px',
+      fontWeight: '600',
+      color: themeConfig.text,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px'
+    }
+  }
+
+  function featureListStyles() {
+    return {
+      margin: 0,
+      padding: 0,
+      listStyle: 'none'
+    }
+  }
+
+  function featureItemStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '8px',
+      padding: '4px 0',
+      fontSize: '13px',
+      color: themeConfig.textSecondary,
+      lineHeight: '1.4'
+    }
+  }
+
+  function featureBulletStyles() {
+    return {
+      color: themeConfig.primary,
+      fontWeight: '600',
+      flexShrink: 0,
+      marginTop: '1px'
+    }
+  }
+
+  function teamListStyles() {
+    return {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '8px'
+    }
+  }
+
+  function teamMemberStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px',
+      padding: '4px 8px',
+      background: themeConfig.glassmorphism,
+      border: `1px solid ${themeConfig.border}`,
+      borderRadius: '6px',
+      fontSize: '12px',
+      color: themeConfig.textSecondary,
+      fontWeight: '500'
+    }
+  }
+
+  function tagsContainerStyles() {
+    return {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '6px'
+    }
+  }
+
+  function tagStyles() {
+    return {
+      padding: '4px 8px',
+      background: `${themeConfig.primary}20`,
+      color: themeConfig.primary,
+      border: `1px solid ${themeConfig.primary}40`,
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '500'
+    }
+  }
+
+  function actionButtonsStyles() {
+    return {
+      display: 'flex',
+      gap: '8px',
+      marginTop: '12px',
+      paddingTop: '12px',
+      borderTop: `1px solid ${themeConfig.border}`
+    }
+  }
+
+  function primaryActionButtonStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      padding: '8px 16px',
+      background: themeConfig.primary,
+      color: '#ffffff',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      fontSize: '13px',
+      fontWeight: '500',
+      outline: 'none'
+    }
+  }
+
+  function secondaryActionButtonStyles() {
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      padding: '8px 12px',
+      background: themeConfig.glassmorphism,
+      color: themeConfig.text,
+      border: `1px solid ${themeConfig.border}`,
+      borderRadius: '8px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      fontSize: '13px',
+      fontWeight: '500',
+      outline: 'none'
+    }
+  }
+
+  function emptyStateStyles() {
+    return {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '60px 20px',
+      textAlign: 'center'
+    }
+  }
+
+  function emptyIconStyles() {
+    return {
+      fontSize: '64px',
+      marginBottom: '16px',
+      opacity: 0.5
+    }
+  }
+
+  function emptyTitleStyles() {
+    return {
+      margin: '0 0 8px 0',
+      fontSize: '24px',
+      fontWeight: '600',
+      color: themeConfig.text
+    }
+  }
+
+  function emptyDescriptionStyles() {
+    return {
+      margin: 0,
+      fontSize: '16px',
+      color: themeConfig.textSecondary,
+      maxWidth: '400px'
+    }
+  }
+
+  function getCustomStyles() {
+    return `
+      /* Hover effects */
+      .project-card:hover {
+        transform: translateY(-4px);
+        box-shadow: ${themeConfig.shadow};
+        border-color: ${themeConfig.primary}40;
+      }
+
+      .grid-mode:hover .project-title {
+        color: ${themeConfig.primary};
+      }
+
+      .list-mode:hover {
+        background: ${themeConfig.glassmorphism};
+      }
+
+      /* View mode button hover */
+      button[style*="viewModeButtonStyles"]:not([style*="background: ${themeConfig.primary}"]):hover {
+        background: ${themeConfig.glassmorphism} !important;
+      }
+
+      /* Action button hovers */
+      button[style*="actionButtonStyles"]:hover,
+      button[style*="primaryActionButtonStyles"]:hover {
+        transform: translateY(-1px);
+        box-shadow: ${themeConfig.shadowLight};
+      }
+
+      button[style*="secondaryActionButtonStyles"]:hover {
+        border-color: ${themeConfig.primary};
+        background: ${themeConfig.primary}10;
+      }
+
+      /* Tech badge hover */
+      span[style*="techBadgeStyles"]:hover {
+        transform: scale(1.05);
+      }
+
+      /* Expand button hover */
+      button[style*="expandButtonStyles"]:hover {
+        color: ${themeConfig.primary} !important;
+        padding-left: 8px;
+      }
+
+      /* Animations */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .showcase-grid {
+          grid-template-columns: 1fr !important;
+        }
+
+        .showcase-card {
+          grid-template-columns: 1fr !important;
+        }
+
+        .list-mode {
+          flex-direction: column !important;
+        }
+
+        .image-container {
+          width: 100% !important;
+          height: 200px !important;
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .view-mode-toggle {
+          align-self: stretch;
+        }
+
+        .metrics {
+          gap: 8px !important;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 16px;
+        }
+
+        .project-card {
+          margin: 0 -4px;
+        }
+
+        .content {
+          padding: 16px !important;
+        }
+
+        .technologies {
+          gap: 4px !important;
+        }
+
+        .view-mode-toggle button {
+          flex: 1;
+          justify-content: center;
+        }
+      }
+
+      /* Accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      /* Focus styles */
+      button:focus {
+        outline: 2px solid ${themeConfig.primary};
+        outline-offset: 2px;
+      }
+
+      .project-card:focus {
+        outline: 2px solid ${themeConfig.primary};
+        outline-offset: 2px;
+      }
+    `
+  }
 }
 
 export default FeatureShowcase

@@ -8,6 +8,7 @@ import ShowEmployees from './components/ShowEmployees'
 import Products from './components/Products'
 import Dashboard from './components/Dashboard'
 import Profile from './components/Profile'
+import PortfolioProject from './components/PortfolioProject'
 
 export default class Main extends Component {
   constructor(props) {
@@ -416,6 +417,30 @@ export default class Main extends Component {
                     👤 Profile
                   </NavLink>
                 )}
+
+                {isLoggedIn && (
+                  <NavLink 
+                    to='/portfolio' 
+                    style={({ isActive }) => ({
+                      textDecoration: 'none',
+                      padding: '12px 20px',
+                      borderRadius: '10px',
+                      color: isActive ? 'white' : '#9c27b0',
+                      background: isActive ? 'linear-gradient(135deg, #9c27b0, #7b1fa2)' : 'transparent',
+                      border: '2px solid #9c27b0',
+                      fontWeight: '600',
+                      transition: 'all 0.3s ease',
+                      fontSize: '14px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: isActive ? '0 8px 25px rgba(156, 39, 176, 0.3)' : 'none'
+                    })}
+                    onClick={() => this.handleNavigation('/portfolio')}
+                  >
+                    💼 Portfolio
+                  </NavLink>
+                )}
                 
                 {!isLoggedIn && (
                   <NavLink 
@@ -794,6 +819,7 @@ export default class Main extends Component {
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/portfolio" element={<PortfolioProject />} />
                 <Route path="/showemps" element={<ShowEmployees />} />
                 <Route path="/products" element={<Products />} />
               </Routes>
