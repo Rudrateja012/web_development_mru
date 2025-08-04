@@ -15,7 +15,7 @@ export default class Login extends Component {
     const { name, value } = e.target
     this.setState({
       [name]: value,
-      errors: { ...this.state.errors, [name]: '' } // Clear error when user types
+      errors: { ...this.state.errors, [name]: '' } 
     })
   }
 
@@ -23,14 +23,12 @@ export default class Login extends Component {
     const { emailId, password } = this.state
     const errors = {}
 
-    // Email validation
     if (!emailId.trim()) {
       errors.emailId = 'Email is required'
     } else if (!/\S+@\S+\.\S+/.test(emailId)) {
       errors.emailId = 'Email is invalid'
     }
 
-    // Password validation
     if (!password.trim()) {
       errors.password = 'Password is required'
     } else if (password.length < 6) {
@@ -51,16 +49,13 @@ export default class Login extends Component {
 
     this.setState({ isLoading: true })
 
-    // Simulate API call
     setTimeout(() => {
       const { emailId, password } = this.state
       
-      // Get registered users from localStorage
       const users = JSON.parse(localStorage.getItem('registeredUsers')) || []
       const user = users.find(user => user.email === emailId && user.password === password)
       
       if (user) {
-        // Store current user session
         localStorage.setItem('currentUser', JSON.stringify({
           firstName: user.firstName,
           lastName: user.lastName,
@@ -70,7 +65,6 @@ export default class Login extends Component {
         
         alert(`Login Successful! Welcome ${user.firstName} ${user.lastName}!`)
         
-        // Clear form
         this.setState({ 
           emailId: '', 
           password: '', 
@@ -89,7 +83,6 @@ export default class Login extends Component {
   render() {
     const { emailId, password, errors, isLoading } = this.state
     
-    // Check if there are any registered users
     const users = JSON.parse(localStorage.getItem('registeredUsers')) || []
     const hasRegisteredUsers = users.length > 0
 
