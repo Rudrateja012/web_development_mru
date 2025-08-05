@@ -21,6 +21,9 @@ function Register() {
 
   return (
     <div>
+      <header>
+        <h1>Product Manager System</h1>
+      </header>
       <h2>Register</h2>
       <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} /><br/>
       <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} /><br/>

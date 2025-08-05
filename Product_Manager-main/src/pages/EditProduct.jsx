@@ -28,6 +28,9 @@ function EditProduct() {
 
   return (
     <div>
+      <header>
+        <h1>Product Manager System</h1>
+      </header>
       <h2>Edit Product</h2>
       <input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} /><br/>
       <input placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} /><br/>

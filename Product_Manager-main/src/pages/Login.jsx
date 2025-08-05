@@ -20,6 +20,9 @@ function Login() {
 
   return (
     <div>
+      <header>
+        <h1>Product Manager System</h1>
+      </header>
       <h2>Login</h2>
       <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} /><br />
       <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} /><br/>

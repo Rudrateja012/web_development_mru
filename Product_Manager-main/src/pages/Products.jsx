@@ -34,6 +34,9 @@ function Products() {
 
   return (
     <div>
+      <header>
+        <h1>Product Manager System</h1>
+      </header>
       <h2>Welcome {user.name}</h2>
       <button onClick={logout}>Logout</button>
       <Link to="/add"><button>Add Product</button></Link>
